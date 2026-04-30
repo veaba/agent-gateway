@@ -2,7 +2,11 @@
 
 Unified gateway for managing multiple AI coding tools with provider-plan-model-agent hierarchy, automatic fallback, quota control, and protocol translation.
 
-<div align="center">  📖[中文版 README](./README_zh-CN.md) </div>
+<div align="center">  
+
+📖 [中文](README_zh-CN.md)
+
+</div>
 
 ## Features
 
