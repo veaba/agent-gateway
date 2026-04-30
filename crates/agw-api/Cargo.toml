@@ -1,0 +1,21 @@
+[package]
+name = "agw-api"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "agw-api"
+path = "src/main.rs"
+
+[dependencies]
+agw-core = { path = "../agw-core" }
+tokio.workspace = true
+axum.workspace = true
+reqwest.workspace = true
+tower-http.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+anyhow.workspace = true
+chrono.workspace = true

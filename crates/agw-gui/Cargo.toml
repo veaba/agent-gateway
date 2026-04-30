@@ -1,0 +1,18 @@
+[package]
+name = "agw-gui"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+agw-core = { path = "../agw-core" }
+tauri = { version = "2", features = [] }
+tauri-plugin-clipboard-manager = "2"
+open = "5"
+tokio.workspace = true
+axum.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+anyhow.workspace = true
+
+[build-dependencies]
+tauri-build = { version = "2.0", features = [] }

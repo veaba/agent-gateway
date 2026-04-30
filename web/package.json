@@ -1,0 +1,26 @@
+{
+  "name": "agent-gateway-gui",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:check": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3",
+    "@tauri-apps/api": "^2.0",
+    "axios": "^1.6",
+    "element-plus": "^2.5",
+    "vue": "^3.4",
+    "vue-router": "^4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "@vitejs/plugin-vue": "^5.0",
+    "typescript": "^5.3",
+    "vite": "^5.0",
+    "vue-tsc": "^2.0"
+  }
+}
