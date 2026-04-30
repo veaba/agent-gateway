@@ -1,17 +1,20 @@
 //! agent-gateway API Server
 
-use anyhow::Result;
-use axum::{
-    routing::{get, post},
-    Router,
-};
 use std::net::SocketAddr;
+
+use anyhow::Result;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
 
-mod router;
+use agw_core::business::start_health_monitor;
+
+mod state;
+mod error;
+mod types;
 mod handlers;
 mod middleware;
+
+pub use state::AppState;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -25,20 +28,30 @@ async fn main() -> Result<()> {
 
     tracing::info!("Starting agent-gateway API server...");
 
+    // 初始化 AppState
+    let state = AppState::init().await?;
+    tracing::info!("AppState initialized");
+
+    // 启动后台健康监控任务
+    // 每 5 分钟检查一次健康的 plan
+    // 每 1 分钟检查一次处于 Error 状态的 plan（用于快速检测恢复）
+    start_health_monitor(
+        state.health_checker.clone(),
+        300,  // 5 分钟正常检查间隔
+        60,   // 1 分钟恢复检测间隔
+    ).await;
+
     // CORS 配置
     let cors = CorsLayer::new()
         .allow_origin(Any)
         .allow_methods(Any)
         .allow_headers(Any);
 
-    // 路由
-    let app = Router::new()
-        .route("/health", get(handlers::health))
-        .route("/api/v1/plans", get(handlers::list_plans))
-        .route("/api/v1/plans", post(handlers::create_plan))
-        .route("/api/v1/providers", get(handlers::list_providers))
-        .route("/api/v1/quota", get(handlers::quota_status))
-        .route("/api/v1/fallback", get(handlers::fallback_status))
+    // 速率限制器: 每分钟 100 请求
+    let rate_limiter = middleware::rate_limit::RateLimiter::new(100, 60);
+
+    // 创建路由并应用中间件
+    let app = middleware::apply(handlers::create_router(state), rate_limiter)
         .layer(cors)
         .layer(TraceLayer::new_for_http());
 

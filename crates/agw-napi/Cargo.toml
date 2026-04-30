@@ -1,0 +1,28 @@
+[package]
+name = "agw-napi"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lib]
+name = "agw_napi"
+path = "src/lib.rs"
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+agw-core = { path = "../agw-core" }
+napi = { version = "2", features = ["async", "serde-json", "tokio_rt"] }
+napi-derive = "2"
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+chrono = { workspace = true }
+anyhow = { workspace = true }
+uuid = { workspace = true }
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+lto = true

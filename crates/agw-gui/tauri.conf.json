@@ -12,15 +12,21 @@
   "app": {
     "windows": [
       {
-        "title": "agent-gateway",
+        "title": "Agent Gateway",
         "width": 1200,
         "height": 800,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "center": true
       }
     ],
     "security": {
       "csp": null
+    },
+    "trayIcon": {
+      "iconPath": "icons/32x32.png",
+      "iconAsTemplate": true,
+      "tooltip": "Agent Gateway"
     }
   },
   "bundle": {

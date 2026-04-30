@@ -9,3 +9,4 @@ pub mod quota;
 pub mod config;
 pub mod log;
 pub mod completion;
+pub mod plugin;

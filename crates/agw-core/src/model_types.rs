@@ -54,6 +54,17 @@ impl Default for PlanTier {
     }
 }
 
+impl std::fmt::Display for PlanTier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PlanTier::Free => write!(f, "free"),
+            PlanTier::Pro => write!(f, "pro"),
+            PlanTier::Enterprise => write!(f, "enterprise"),
+            PlanTier::Custom => write!(f, "custom"),
+        }
+    }
+}
+
 // ============================================================================
 // 模型能力
 // ============================================================================
@@ -74,6 +85,19 @@ pub enum ModelCapability {
     Math,
     /// 多模态
     Multimodal,
+}
+
+impl std::fmt::Display for ModelCapability {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ModelCapability::Code => write!(f, "code"),
+            ModelCapability::Reasoning => write!(f, "reasoning"),
+            ModelCapability::LongContext => write!(f, "long_context"),
+            ModelCapability::ChineseOptimized => write!(f, "chinese_optimized"),
+            ModelCapability::Math => write!(f, "math"),
+            ModelCapability::Multimodal => write!(f, "multimodal"),
+        }
+    }
 }
 
 // ============================================================================
@@ -99,6 +123,18 @@ pub enum AgentConfigStatus {
 impl Default for AgentConfigStatus {
     fn default() -> Self {
         Self::NotConfigured
+    }
+}
+
+impl std::fmt::Display for AgentConfigStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            AgentConfigStatus::NotConfigured => write!(f, "not_configured"),
+            AgentConfigStatus::AutoConfigured => write!(f, "auto_configured"),
+            AgentConfigStatus::ManuallyConfigured => write!(f, "manually_configured"),
+            AgentConfigStatus::ConfigError => write!(f, "config_error"),
+            AgentConfigStatus::NeedsUpdate => write!(f, "needs_update"),
+        }
     }
 }
 
@@ -187,6 +223,17 @@ impl Default for PluginStatus {
     }
 }
 
+impl std::fmt::Display for PluginStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PluginStatus::Installed => write!(f, "installed"),
+            PluginStatus::Enabled => write!(f, "enabled"),
+            PluginStatus::Disabled => write!(f, "disabled"),
+            PluginStatus::Error => write!(f, "error"),
+        }
+    }
+}
+
 // ============================================================================
 // 插件类型
 // ============================================================================
@@ -206,5 +253,15 @@ pub enum PluginType {
 impl Default for PluginType {
     fn default() -> Self {
         Self::Provider
+    }
+}
+
+impl std::fmt::Display for PluginType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PluginType::Provider => write!(f, "provider"),
+            PluginType::Transform => write!(f, "transform"),
+            PluginType::Tool => write!(f, "tool"),
+        }
     }
 }

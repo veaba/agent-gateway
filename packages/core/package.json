@@ -1,0 +1,32 @@
+{
+  "name": "@agent-gateway/core",
+  "version": "0.1.0",
+  "description": "Core types and interfaces for agent-gateway",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --external shims",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "test": "echo 'No tests yet'",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": ["agent-gateway", "ai-gateway", "proxy"],
+  "license": "MIT OR Apache-2.0",
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  }
+}

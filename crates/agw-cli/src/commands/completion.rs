@@ -1,7 +1,10 @@
 //! completion 命令
 
 use anyhow::Result;
-use clap::{Parser, ValueEnum};
+use clap::{CommandFactory, Parser, ValueEnum};
+use clap_complete::{generate, Shell as ClapShell};
+
+use crate::Cli;
 
 /// Shell 补全命令
 #[derive(Parser, Debug)]
@@ -22,24 +25,15 @@ pub enum Shell {
 
 impl CompletionCommand {
     pub async fn run(&self) -> Result<()> {
-        // TODO: 生成补全脚本
-        match self.shell {
-            Shell::Bash => {
-                tracing::info!("Generating bash completion script");
-            }
-            Shell::Zsh => {
-                tracing::info!("Generating zsh completion script");
-            }
-            Shell::Fish => {
-                tracing::info!("Generating fish completion script");
-            }
-            Shell::PowerShell => {
-                tracing::info!("Generating PowerShell completion script");
-            }
-            Shell::Elvish => {
-                tracing::info!("Generating elvish completion script");
-            }
-        }
+        let shell = match self.shell {
+            Shell::Bash => ClapShell::Bash,
+            Shell::Zsh => ClapShell::Zsh,
+            Shell::Fish => ClapShell::Fish,
+            Shell::PowerShell => ClapShell::PowerShell,
+            Shell::Elvish => ClapShell::Elvish,
+        };
+
+        generate(shell, &mut Cli::command(), "agw", &mut std::io::stdout());
         Ok(())
     }
 }

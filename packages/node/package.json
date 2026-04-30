@@ -1,0 +1,41 @@
+{
+  "name": "@agent-gateway/node",
+  "version": "0.1.0",
+  "description": "Node.js bindings for agent-gateway native core",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "prebuilds"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --external shims",
+    "build:bindings": "cd ../../crates/agw-napi && cargo build --release",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "test": "echo 'No tests yet'",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@agent-gateway/core": "workspace:*",
+    "node-addon-api": "^8.0.0"
+  },
+  "optionalDependencies": {
+    "@agent-gateway/node-win32-x64": "0.1.0"
+  },
+  "keywords": ["agent-gateway", "ai-gateway", "native"],
+  "license": "MIT OR Apache-2.0",
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  }
+}

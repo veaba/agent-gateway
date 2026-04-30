@@ -27,7 +27,7 @@ agent-gateway is a unified gateway for managing multiple AI coding tools (Claude
 
 ## Architecture
 
-```
+```txt
 ┌───────────────────────────────────────
 ──────────┐
 │  CLI (agw-cli) │ GUI (agw-gui/Tauri) │ API (agw-api) │
@@ -51,7 +51,7 @@ agent-gateway is a unified gateway for managing multiple AI coding tools (Claude
 
 ## Directory Structure
 
-```
+```txt
 agent-gateway/
 ├── Cargo.toml                    # Workspace root
 ├── crates/
@@ -72,7 +72,7 @@ agent-gateway/
 │       ├── views/                # Dashboard, Plans, Providers, Agents, Fallback, Quota, Logs, Settings
 │       ├── components/           # Reusable UI components
 │       └── composables/          # Vue composables
-├── npm-packages/                 # @agent-gateway/* (node, core, cli)
+├── packages/                 # @agent-gateway/* (node, core, cli)
 └── scripts/                      # build.sh, build-npm.sh
 ```
 
@@ -109,6 +109,7 @@ kill <PID>                # Linux/macOS
 ```
 
 **API Endpoints:**
+
 - `GET /health` - Health check
 - `GET /api/v1/plans` - List plans
 - `POST /api/v1/plans` - Create plan

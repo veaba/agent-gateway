@@ -5,14 +5,17 @@ edition.workspace = true
 
 [dependencies]
 agw-core = { path = "../agw-core" }
-tauri = { version = "2", features = [] }
+tauri = { version = "2", features = ["tray-icon"] }
 tauri-plugin-clipboard-manager = "2"
+tauri-plugin-shell = "2"
 open = "5"
 tokio.workspace = true
 axum.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
 anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
 
 [build-dependencies]
 tauri-build = { version = "2.0", features = [] }

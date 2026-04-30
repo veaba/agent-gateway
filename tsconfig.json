@@ -1,0 +1,24 @@
+{
+  "name": "@agent-gateway/workspace",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/@agent-gateway/*"
+  ],
+  "packageManager": "bun@1.2.9",
+  "scripts": {
+    "build": "bun run --filter '@agent-gateway/*' build",
+    "build:core": "bun run --filter '@agent-gateway/core' build",
+    "build:node": "bun run --filter '@agent-gateway/node' build",
+    "build:cli": "bun run --filter '@agent-gateway/cli' build",
+    "build:bindings": "cd ../crates/agw-napi && cargo build --release",
+    "dev": "bun run --filter '@agent-gateway/core' dev",
+    "clean": "bun run --filter '@agent-gateway/*' clean",
+    "typecheck": "bun run --filter '@agent-gateway/*' typecheck",
+    "test": "bun run --filter '@agent-gateway/*' test"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "tsup": "^8.0.0"
+  }
+}

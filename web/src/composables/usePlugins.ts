@@ -1,6 +1,5 @@
 import { ref } from 'vue'
-import type { Plugin } from '@/types'
-import { fetchPlugins, installPlugin, uninstallPlugin, enablePlugin, disablePlugin } from '@/api'
+import { fetchPlugins, installPlugin, uninstallPlugin, enablePlugin, disablePlugin, updatePlugin } from '@/api'
 
 export interface PluginInfo {
   id: string
@@ -49,6 +48,22 @@ export function usePlugins() {
     }
   }
 
+  const update = async (id: string, source?: string) => {
+    try {
+      const plugin = await updatePlugin(id, source)
+      const index = plugins.value.findIndex(p => p.id === id)
+      if (index !== -1) {
+        plugins.value[index] = plugin
+      } else {
+        plugins.value.push(plugin)
+      }
+      return plugin
+    } catch (e) {
+      error.value = '更新插件失败'
+      throw e
+    }
+  }
+
   const enable = async (id: string) => {
     try {
       await enablePlugin(id)
@@ -77,6 +92,7 @@ export function usePlugins() {
     error,
     loadPlugins,
     install,
+    update,
     uninstall,
     enable,
     disable

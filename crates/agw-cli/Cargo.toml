@@ -20,4 +20,13 @@ thiserror.workspace = true
 chrono.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+serde_yaml.workspace = true
 dirs.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+mockall.workspace = true
+wiremock.workspace = true
+tokio-test.workspace = true
+tempfile.workspace = true
+reqwest = { workspace = true, features = ["json"] }

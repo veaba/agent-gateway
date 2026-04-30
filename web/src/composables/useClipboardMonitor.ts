@@ -2,16 +2,24 @@ import { ref } from 'vue'
 
 export function useClipboardMonitor() {
   const detectedKey = ref<string>('')
-  let interval: number | null = null
+  let interval: ReturnType<typeof setInterval> | null = null
 
   const start = async () => {
-    // TODO: 实现剪贴板监控
-    // interval = window.setInterval(async () => {
-    //   const content = await invoke<string>('check_clipboard_for_key')
-    //   if (content) {
-    //     detectedKey.value = content
-    //   }
-    // }, 2000)
+    if (!window.__TAURI__) return
+
+    interval = setInterval(async () => {
+      try {
+        const { invoke } = await import('@tauri-apps/api/core')
+        const result = await invoke<string | null>('check_clipboard_for_key', {
+          expectedPrefix: null
+        })
+        if (result) {
+          detectedKey.value = result
+        }
+      } catch {
+        // ignore clipboard errors
+      }
+    }, 2000)
   }
 
   const stop = () => {
@@ -30,5 +38,11 @@ export function useClipboardMonitor() {
     start,
     stop,
     clear
+  }
+}
+
+declare global {
+  interface Window {
+    __TAURI__?: unknown
   }
 }

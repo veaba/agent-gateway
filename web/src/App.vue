@@ -1,13 +1,17 @@
 <template>
-  <div class="app-container">
+  <div class="app-container agw-grid-bg">
     <el-container class="app-layout">
-      <el-aside width="240px" class="sidebar">
+      <el-aside width="248px" class="sidebar">
         <div class="logo-container">
           <div class="logo-icon">
-            <el-icon :size="28"><Connection /></el-icon>
+            <el-icon :size="26"><DataBoard /></el-icon>
           </div>
-          <span class="logo-text">Agent Gateway</span>
+          <div class="logo-text-group">
+            <span class="logo-text">Agent Gateway</span>
+            <span class="logo-sub">AI Proxy Hub</span>
+          </div>
         </div>
+
         <el-menu
           :default-active="$route.path"
           router
@@ -23,37 +27,57 @@
             <span>我的套餐</span>
           </el-menu-item>
           <el-menu-item index="/fallback">
-            <el-icon><Refresh /></el-icon>
+            <el-icon><RefreshLeft /></el-icon>
             <span>降级策略</span>
           </el-menu-item>
           <el-menu-item index="/quota">
             <el-icon><DataLine /></el-icon>
             <span>配额使用</span>
           </el-menu-item>
+          <el-menu-item index="/stats">
+            <el-icon><TrendCharts /></el-icon>
+            <span>统计数据</span>
+          </el-menu-item>
           <el-menu-item index="/logs">
-            <el-icon><Document /></el-icon>
+            <el-icon><Tickets /></el-icon>
             <span>请求日志</span>
           </el-menu-item>
           <el-menu-item index="/plugins">
             <el-icon><Box /></el-icon>
             <span>插件管理</span>
           </el-menu-item>
+          <div class="menu-divider"></div>
+          <el-menu-item index="/guide">
+            <el-icon><Guide /></el-icon>
+            <span>配置引导</span>
+          </el-menu-item>
           <el-menu-item index="/settings">
             <el-icon><Setting /></el-icon>
             <span>设置</span>
           </el-menu-item>
         </el-menu>
+
         <div class="sidebar-footer">
+          <div class="gateway-status" :class="{ 'is-online': isConnected }">
+            <span class="status-dot"></span>
+            <span class="status-text">{{ isConnected ? '服务在线' : '服务离线' }}</span>
+          </div>
           <div class="version-info">v0.1.0</div>
         </div>
+
+        <div class="sidebar-glow"></div>
       </el-aside>
 
       <el-container class="main-container">
         <el-header class="app-header">
           <div class="header-left">
             <h1 class="page-title">{{ pageTitle }}</h1>
+            <span v-if="breadcrumb" class="page-breadcrumb">{{ breadcrumb }}</span>
           </div>
           <div class="header-right">
+            <el-badge :value="notificationCount" :hidden="notificationCount === 0" class="header-badge">
+              <el-button circle :icon="Bell" class="icon-btn" />
+            </el-badge>
             <el-button type="primary" class="add-btn" @click="$router.push('/plans/add')">
               <el-icon><Plus /></el-icon>
               添加套餐
@@ -74,10 +98,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { Bell } from '@element-plus/icons-vue'
+import { healthCheck } from '@/api'
 
 const route = useRoute()
+const isConnected = ref(false)
+const notificationCount = ref(0)
 
 const pageTitle = computed(() => {
   const titles: Record<string, string> = {
@@ -86,11 +114,29 @@ const pageTitle = computed(() => {
     '/plans/add': '添加套餐',
     '/fallback': '降级策略',
     '/quota': '配额使用',
+    '/stats': '统计数据',
     '/logs': '请求日志',
     '/plugins': '插件管理',
     '/settings': '设置'
   }
   return titles[route.path] || 'Agent Gateway'
+})
+
+const breadcrumb = computed(() => {
+  const crumbs: Record<string, string> = {
+    '/plans/add': '创建新的 AI 服务配置'
+  }
+  return crumbs[route.path] || ''
+})
+
+const checkHealth = async () => {
+  isConnected.value = await healthCheck()
+}
+
+onMounted(() => {
+  checkHealth()
+  // Check health every 30 seconds
+  setInterval(checkHealth, 30000)
 })
 </script>
 
@@ -98,31 +144,31 @@ const pageTitle = computed(() => {
 .app-container {
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  overflow: hidden;
 }
 
 .app-layout {
   height: 100%;
-  background: var(--el-bg-color);
 }
 
-/* Sidebar Styles */
+/* ── Sidebar ── */
 .sidebar {
-  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  background: linear-gradient(180deg, #0d1018 0%, #0a0d14 100%);
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.sidebar::before {
-  content: '';
+.sidebar-glow {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(ellipse at top, rgba(102, 126, 234, 0.15) 0%, transparent 60%);
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(ellipse, rgba(14, 165, 233, 0.08) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -130,133 +176,233 @@ const pageTitle = computed(() => {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 24px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .logo-icon {
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.3);
+  flex-shrink: 0;
+}
+
+.logo-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
 .logo-text {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
-  color: white;
-  letter-spacing: -0.5px;
+  color: #e8eaf0;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.logo-sub {
+  font-size: 10px;
+  font-weight: 500;
+  color: #4a5068;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .sidebar-menu {
   flex: 1;
   background: transparent;
   border: none;
-  padding: 16px 12px;
+  padding: 12px 8px;
+  overflow-y: auto;
+}
+
+.menu-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.05);
+  margin: 8px 12px;
 }
 
 .sidebar-menu :deep(.el-menu-item) {
-  height: 48px;
-  line-height: 48px;
-  margin: 4px 0;
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.7);
-  transition: all 0.3s ease;
+  height: 44px;
+  line-height: 44px;
+  margin: 2px 0;
+  border-radius: 10px;
+  color: #8b92a8;
+  font-size: 14px;
+  transition: all 0.25s ease;
+  position: relative;
 }
 
 .sidebar-menu :deep(.el-menu-item:hover) {
-  background: rgba(102, 126, 234, 0.2);
-  color: white;
+  background: rgba(255, 255, 255, 0.04);
+  color: #c4c9d8;
 }
 
 .sidebar-menu :deep(.el-menu-item.is-active) {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(90deg, rgba(14, 165, 233, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%);
+  color: #38bdf8;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(14, 165, 233, 0.2);
 }
 
 .sidebar-menu :deep(.el-menu-item .el-icon) {
-  font-size: 18px;
-  margin-right: 12px;
+  font-size: 17px;
+  margin-right: 10px;
+  width: 20px;
 }
 
+/* ── Sidebar Footer ── */
 .sidebar-footer {
-  padding: 16px 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 14px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gateway-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #4a5068;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4a5068;
+  transition: all 0.3s ease;
+}
+
+.gateway-status.is-online .status-dot {
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.status-text {
+  font-family: var(--agw-font-mono, monospace);
 }
 
 .version-info {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
-  text-align: center;
+  font-size: 11px;
+  color: #2a2f3a;
+  font-family: var(--agw-font-mono, monospace);
 }
 
-/* Main Container */
+/* ── Main Container ── */
 .main-container {
   display: flex;
   flex-direction: column;
-  background: var(--el-bg-color-page);
+  background: var(--el-bg-color-page, #0f1117);
 }
 
-/* Header Styles */
+/* ── Header ── */
 .app-header {
-  background: var(--el-bg-color);
-  border-bottom: 1px solid var(--el-border-color-light);
+  background: rgba(15, 17, 23, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32px;
-  height: 72px;
+  padding: 0 28px;
+  height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
 }
 
 .page-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--el-text-color-primary);
+  font-size: 20px;
+  font-weight: 700;
+  color: #e8eaf0;
   margin: 0;
   letter-spacing: -0.5px;
 }
 
-.add-btn {
-  height: 40px;
-  padding: 0 20px;
-  border-radius: 10px;
-  font-weight: 500;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.page-breadcrumb {
+  font-size: 13px;
+  color: #4a5068;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #8b92a8;
+  width: 36px;
+  height: 36px;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #c4c9d8;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.header-badge :deep(.el-badge__content) {
+  background: #0ea5e9;
   border: none;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.add-btn {
+  height: 36px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+  border: none;
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
   transition: all 0.3s ease;
 }
 
 .add-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #38bdf8 0%, #22d3ee 100%);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+  transform: translateY(-1px);
 }
 
-/* Main Content */
+/* ── Main Content ── */
 .app-main {
-  padding: 24px 32px;
+  padding: 24px 28px;
   overflow-y: auto;
+  flex: 1;
 }
 
-/* Page Transitions */
+/* ── Page Transitions ── */
 .fade-slide-enter-active,
 .fade-slide-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .fade-slide-enter-from {
   opacity: 0;
-  transform: translateX(20px);
+  transform: translateX(16px);
 }
 
 .fade-slide-leave-to {
   opacity: 0;
-  transform: translateX(-20px);
+  transform: translateX(-16px);
 }
 </style>

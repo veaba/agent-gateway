@@ -1,0 +1,41 @@
+{
+  "name": "@agent-gateway/cli",
+  "version": "0.1.0",
+  "description": "CLI tool for agent-gateway",
+  "bin": {
+    "agw": "./dist/cli.js"
+  },
+  "main": "./dist/cli.js",
+  "module": "./dist/cli.mjs",
+  "types": "./dist/cli.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/cli.mjs",
+      "types": "./dist/cli.d.ts",
+      "require": "./dist/cli.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/cli.ts --format cjs,esm --dts --external shims",
+    "dev": "tsup src/cli.ts --format cjs,esm --dts --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "test": "echo 'No tests yet'",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@agent-gateway/core": "workspace:*",
+    "@agent-gateway/node": "workspace:*",
+    "commander": "^12.0.0",
+    "chalk": "^5.3.0"
+  },
+  "keywords": ["agent-gateway", "cli", "ai-gateway"],
+  "license": "MIT OR Apache-2.0",
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  }
+}

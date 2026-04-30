@@ -9,7 +9,7 @@ path = "src/lib.rs"
 
 [dependencies]
 tokio.workspace = true
-axum.workspace = true
+axum = { workspace = true, features = ["macros"] }
 reqwest.workspace = true
 http-body.workspace = true
 http-body-util.workspace = true
@@ -39,8 +39,19 @@ rustc-hash.workspace = true
 shellexpand.workspace = true
 dirs.workspace = true
 open.workspace = true
+flate2 = "1"
+futures-util.workspace = true
+tokio-stream.workspace = true
+
+[dev-dependencies]
+mockall.workspace = true
+wiremock.workspace = true
+tokio-test.workspace = true
+tempfile.workspace = true
+reqwest = { workspace = true, features = ["json"] }
 
 [features]
 default = ["full"]
 full = []
 minimal = []
+core = []

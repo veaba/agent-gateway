@@ -28,6 +28,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/Quota.vue')
   },
   {
+    path: '/stats',
+    name: 'Stats',
+    component: () => import('@/views/Stats.vue')
+  },
+  {
     path: '/logs',
     name: 'Logs',
     component: () => import('@/views/Logs.vue')
@@ -41,6 +46,11 @@ const routes: RouteRecordRaw[] = [
     path: '/settings',
     name: 'Settings',
     component: () => import('@/views/Settings.vue')
+  },
+  {
+    path: '/guide',
+    name: 'OnboardingGuide',
+    component: () => import('@/views/OnboardingGuide.vue')
   }
 ]
 

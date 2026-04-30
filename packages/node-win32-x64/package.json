@@ -1,0 +1,14 @@
+{
+  "name": "@agent-gateway/node-win32-x64",
+  "version": "0.1.0",
+  "description": "Windows x64 native bindings for agent-gateway",
+  "main": "./native/agw-napi.win32-x64.node",
+  "types": "./native/agw-napi.win32-x64.d.ts",
+  "files": [
+    "native"
+  ],
+  "keywords": ["agent-gateway", "native", "windows", "x64"],
+  "license": "MIT OR Apache-2.0",
+  "os": ["win32"],
+  "arch": ["x64"]
+}

@@ -41,7 +41,7 @@ impl EncryptionService {
         if let Some(parent) = key_path.parent() {
             std::fs::create_dir_all(parent)?;
         }
-        std::fs::write(&key_path, &key)?;
+        std::fs::write(key_path, key)?;
 
         Ok(Self::new(&key))
     }

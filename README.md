@@ -123,7 +123,7 @@ cd crates/agw-gui
 cargo tauri dev
 ```
 
-![/agent-gateway-desktop](./docs/assets/agent-gateway-desktop.png)
+![/agent-gateway-desktop](./docs/public/assets/agent-gateway-desktop.png)
 
 ## Configuration
 

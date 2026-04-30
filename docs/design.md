@@ -1912,11 +1912,11 @@ agent-gateway/
 │           ├── useClipboardMonitor.ts      # 剪贴板监听
 │           └── useProviders.ts           # Provider管理
 │
-├── npm-packages/
-│   └── @agent-gateway/
-│       ├── node/
-│       ├── core/
-│       └── cli/
+├── packages/
+│   └── @node/
+│   └── core/
+│   └── cli/
+│   └── node-win32-x64/
 │
 └── scripts/
     ├── build.sh

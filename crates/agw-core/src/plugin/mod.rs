@@ -5,9 +5,13 @@ pub mod registry;
 pub mod lifecycle;
 pub mod installer;
 pub mod manifest;
+pub mod host;
+pub mod provider_plugin;
 
 pub use engine::*;
 pub use registry::*;
 pub use lifecycle::*;
 pub use installer::*;
 pub use manifest::*;
+pub use host::*;
+pub use provider_plugin::*;

@@ -1,0 +1,34 @@
+{
+  "name": "@agent-gateway/workspace",
+  "version": "0.1.0",
+  "private": true,
+  "author": "veaba",
+  "type": "module",
+  "workspaces": [
+    "./*"
+  ],
+  "packageManager": "bun@1.2.9",
+  "scripts": {
+    "docs:dev": "rspress dev docs",
+    "docs:build": "rspress build docs",
+    "docs:preview": "rspress preview docs",
+    "build": "bun run --filter '@agent-gateway/*' build",
+    "build:core": "bun run --filter '@agent-gateway/core' build",
+    "build:node": "bun run --filter '@agent-gateway/node' build",
+    "build:cli": "bun run --filter '@agent-gateway/cli' build",
+    "build:bindings": "cd crates/agw-napi && cargo build --release",
+    "build:native": "npm run build:bindings && node scripts/copy-native.js",
+    "prebuild": "npm run build:bindings",
+    "dev": "bun run --filter '@agent-gateway/core' dev",
+    "clean": "bun run --filter '@agent-gateway/*' clean",
+    "typecheck": "bun run --filter '@agent-gateway/*' typecheck",
+    "test": "bun run --filter '@agent-gateway/*' test"
+  },
+  "devDependencies": {
+    "@rspress/core": "^2.0.10",
+    "@rspress/plugin-shiki": "^1.47.1",
+    "@types/node": "^25.6.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  }
+}
