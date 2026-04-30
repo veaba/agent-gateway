@@ -516,7 +516,7 @@ impl SqliteStore {
 
             // 总体统计
             let sql = format!(
-                "SELECT COUNT(*) as total, SUM(CASE WHEN resolved = 1 THEN 1 ELSE 0 END) as resolved, AVG(recovery_latency_ms) as avg_recovery FROM fallback_events WHERE {}",
+                "SELECT COUNT(*) as total, COALESCE(SUM(CASE WHEN resolved = 1 THEN 1 ELSE 0 END), 0) as resolved, AVG(recovery_latency_ms) as avg_recovery FROM fallback_events WHERE {}",
                 where_clause
             );
             let mut stmt = conn.prepare(&sql)?;

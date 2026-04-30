@@ -406,9 +406,9 @@
           <div class="card-header">
             <span class="card-title">使用趋势</span>
             <el-radio-group v-model="granularity" size="small" @change="loadUsageTrend">
-              <el-radio-button label="minute">分钟</el-radio-button>
-              <el-radio-button label="hour">小时</el-radio-button>
-              <el-radio-button label="day">天</el-radio-button>
+              <el-radio-button value="minute">分钟</el-radio-button>
+              <el-radio-button value="hour">小时</el-radio-button>
+              <el-radio-button value="day">天</el-radio-button>
             </el-radio-group>
           </div>
 

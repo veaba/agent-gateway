@@ -88,7 +88,7 @@
         <el-main class="app-main">
           <router-view v-slot="{ Component }">
             <transition name="fade-slide" mode="out-in">
-              <component :is="Component" />
+              <component :is="Component" v-if="Component" :key="$route.path" />
             </transition>
           </router-view>
         </el-main>

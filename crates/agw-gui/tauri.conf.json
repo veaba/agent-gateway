@@ -29,7 +29,7 @@
       "tooltip": "Agent Gateway"
     }
   },
-  "bundle": {
+"bundle": {
     "active": true,
     "targets": "all",
     "icon": [

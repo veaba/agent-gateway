@@ -6,8 +6,10 @@ edition.workspace = true
 [dependencies]
 agw-core = { path = "../agw-core" }
 tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-cli = "2"
 tauri-plugin-clipboard-manager = "2"
 tauri-plugin-shell = "2"
+tauri-plugin-single-instance = "2"
 open = "5"
 tokio.workspace = true
 axum.workspace = true

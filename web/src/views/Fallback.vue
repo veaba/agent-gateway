@@ -93,7 +93,7 @@
               <el-select v-model="config.priority_order" multiple placeholder="拖拽排序选择套餐" class="priority-select">
                 <el-option v-for="plan in plans" :key="plan.id" :label="plan.name" :value="plan.id" />
               </el-select>
-              <div class="priority-hint" v-if="config.priority_order.length > 0">
+              <div class="priority-hint" v-if="(config.priority_order?.length ?? 0) > 0">
                 <el-icon :size="12"><InfoFilled /></el-icon>
                 排列顺序即为降级优先级，首选项为最优先
               </div>
@@ -113,7 +113,7 @@
             <span class="card-title">触发原因分布</span>
           </div>
 
-          <div v-if="stats.byTriggerType.length > 0" class="trigger-distribution">
+          <div v-if="(stats.byTriggerType?.length ?? 0) > 0" class="trigger-distribution">
             <div v-for="item in stats.byTriggerType" :key="item.triggerType" class="trigger-item">
               <div class="trigger-item-header">
                 <div class="trigger-item-left">
@@ -349,7 +349,11 @@ const loadConfig = async () => {
       fetchFallbackConfig(),
       fetchPlans()
     ])
-    config.value = fallbackConfig
+    config.value = {
+      enabled: fallbackConfig.enabled ?? true,
+      max_attempts: fallbackConfig.max_attempts ?? 3,
+      priority_order: fallbackConfig.priority_order ?? []
+    }
     plans.value = planList
   } catch {
     ElMessage.error('加载配置失败')
@@ -372,7 +376,14 @@ const loadEvents = async () => {
 const loadStats = async () => {
   loading.stats = true
   try {
-    stats.value = await fetchFallbackStats()
+    const loadedStats = await fetchFallbackStats()
+    stats.value = {
+      totalEvents: loadedStats.totalEvents ?? 0,
+      totalResolved: loadedStats.totalResolved ?? 0,
+      totalUnresolved: loadedStats.totalUnresolved ?? 0,
+      avgRecoveryLatencyMs: loadedStats.avgRecoveryLatencyMs,
+      byTriggerType: loadedStats.byTriggerType ?? []
+    }
   } catch {
     ElMessage.error('加载统计失败')
   } finally {

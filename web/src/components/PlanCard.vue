@@ -33,14 +33,14 @@
           </div>
           <div class="info-item">
             <span class="label">
-              <el-icon><Robot /></el-icon>
+              <el-icon><Platform  /></el-icon>
               Agent
             </span>
             <div class="agent-tags">
               <el-tag v-for="agent in plan.bound_agents" :key="agent.agent_id" size="small" effect="plain" round>
                 {{ agent.agent_id }}
               </el-tag>
-              <span v-if="!plan.bound_agents.length" class="muted">未绑定</span>
+              <span v-if="!plan.bound_agents?.length" class="muted">未绑定</span>
             </div>
           </div>
         </div>
@@ -373,6 +373,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { Platform  } from '@element-plus/icons-vue'
 import type { UserPlan, Provider, CodingPlan, Model } from '@/types'
 
 const props = defineProps<{
@@ -406,14 +407,14 @@ const providerInfo = computed(() => props.provider || {
 } as Provider)
 
 const currentPlanTemplate = computed((): CodingPlan | undefined => {
-  if (!props.provider) return undefined
+  if (!props.provider?.coding_plans) return undefined
   return props.provider.coding_plans.find(cp => cp.plan_id === props.plan.plan_id)
 })
 
 const availableModels = computed((): Model[] => {
-  if (!props.provider) return []
+  if (!props.provider?.models) return []
   const template = currentPlanTemplate.value
-  if (!template) return props.provider.models
+  if (!template) return props.provider.models || []
   return props.provider.models.filter(m => template.supported_model_ids.includes(m.model_id))
 })
 
@@ -422,9 +423,9 @@ const currentModelInfo = computed((): Model | undefined => {
 })
 
 const unboundAgents = computed(() => {
-  if (!props.provider) return []
+  if (!props.provider?.supported_agents) return []
   const boundIds = props.plan.bound_agents.map(a => a.agent_id)
-  if (currentPlanTemplate.value) {
+  if (currentPlanTemplate.value?.supported_agent_ids) {
     return props.provider.supported_agents.filter(
       a => currentPlanTemplate.value!.supported_agent_ids.includes(a.agent_id) && !boundIds.includes(a.agent_id)
     )
@@ -511,7 +512,7 @@ const getQuotaColor = (percent: number) => {
 }
 
 const getAgentName = (agentId: string) => {
-  if (props.provider) {
+  if (props.provider?.supported_agents) {
     const found = props.provider.supported_agents.find(a => a.agent_id === agentId)
     if (found) return found.name
   }

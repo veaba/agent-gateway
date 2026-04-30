@@ -125,6 +125,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { Refresh, Connection, Warning, Calendar, Moon as Month, Timer } from '@element-plus/icons-vue'
 import { fetchQuotaStatus, fetchPlans } from '@/api'
 import type { QuotaStatus, UserPlan } from '@/types'
 
@@ -221,7 +222,8 @@ const getAlertLabel = (alertType: string) => {
   return labels[alertType] || '配额告警'
 }
 
-const formatNumber = (num: number) => {
+const formatNumber = (num?: number) => {
+  if (num === undefined || num === null) return '0'
   if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
   if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
   return num.toString()

@@ -602,6 +602,7 @@ async fn send_openai_request(
     body_bytes: &[u8],
     target_url: &str,
 ) -> Result<(u16, reqwest::Response), (u16, String)> {
+    let _ = state;
     let forwarder = Forwarder::new();
     let mut req_builder = forwarder.client
         .request(hyper::Method::POST, target_url);
@@ -652,6 +653,8 @@ async fn send_openai_converted_request(
     anthropic_body: &[u8],
     target_url: &str,
 ) -> Result<(u16, reqwest::Response), (u16, String)> {
+    let _ = headers;
+    let _ = state;
     let forwarder = Forwarder::new();
     let mut req_builder = forwarder.client
         .request(hyper::Method::POST, target_url);

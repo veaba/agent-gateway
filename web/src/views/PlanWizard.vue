@@ -114,14 +114,14 @@ const apiKey = ref('')
 const planName = ref('')
 
 const selectedPlan = computed(() => {
-  if (!selectedProvider.value) return null
+  if (!selectedProvider.value?.coding_plans) return null
   return selectedProvider.value.coding_plans.find(p => p.plan_id === selectedPlanId.value)
 })
 
 const availableAgents = computed(() => {
-  if (!selectedPlan.value || !selectedProvider.value) return []
+  if (!selectedPlan.value || !selectedProvider.value?.supported_agents) return []
   return selectedProvider.value.supported_agents.filter(
-    a => selectedPlan.value!.supported_agent_ids.includes(a.agent_id)
+    a => selectedPlan.value!.supported_agent_ids?.includes(a.agent_id)
   )
 })
 

@@ -12,9 +12,9 @@ export interface Provider {
   api_format: 'anthropic' | 'openai' | 'custom'
   requires_api_key: boolean
   onboarding?: ProviderOnboarding
-  coding_plans: CodingPlan[]
-  models: Model[]
-  supported_agents: AgentRef[]
+  coding_plans?: CodingPlan[]
+  models?: Model[]
+  supported_agents?: AgentRef[]
 }
 
 export interface CodingPlan {
@@ -22,15 +22,15 @@ export interface CodingPlan {
   name: string
   description: string
   tier: 'free' | 'pro' | 'enterprise' | 'custom'
-  supported_model_ids: string[]
-  supported_agent_ids: string[]
-  default_model_id: string
-  default_agent_id: string
+  supported_model_ids?: string[]
+  supported_agent_ids?: string[]
+  default_model_id?: string
+  default_agent_id?: string
   quota_daily?: number
   quota_monthly?: number
   rpm_limit?: number
   price?: string
-  features: string[]
+  features?: string[]
 }
 
 export interface Model {

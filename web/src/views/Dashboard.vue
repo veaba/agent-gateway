@@ -229,8 +229,8 @@ const isHealthy = ref(false)
 
 // Stats computed
 const stats = computed(() => {
-  const totalQuotaUsed = quotas.value.reduce((sum, q) => sum + q.usage.daily_used, 0)
-  const totalQuotaLimit = quotas.value.reduce((sum, q) => sum + (q.limits.daily || 1), 0)
+  const totalQuotaUsed = quotas.value.reduce((sum, q) => sum + (q.usage?.daily_used ?? 0), 0)
+  const totalQuotaLimit = quotas.value.reduce((sum, q) => sum + (q.limits?.daily ?? 1), 0)
   const quotaPercent = totalQuotaLimit > 0 ? Math.floor((totalQuotaUsed / totalQuotaLimit) * 100) : 0
 
   const healthyPlans = plans.value.filter(p => p.health_status === 'healthy').length
@@ -240,7 +240,7 @@ const stats = computed(() => {
 
   return {
     plans: plans.value.length,
-    quotaUsedPercent: quotaPercent,
+    quotaUsedPercent: isNaN(quotaPercent) ? 0 : quotaPercent,
     healthStatus,
     lastCheck: '刚刚',
     requestsToday: todayRequests
@@ -256,7 +256,7 @@ const recentRequests = computed(() => {
 const quotaSummary = computed(() => {
   return quotas.value.map(q => ({
     plan_id: q.plan_id,
-    percent: q.limits.daily ? Math.floor((q.usage.daily_used / q.limits.daily) * 100) : 0,
+    percent: q.limits?.daily ? Math.floor(((q.usage?.daily_used ?? 0) / q.limits.daily) * 100) : 0,
     alert: q.alert
   }))
 })
