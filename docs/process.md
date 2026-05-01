@@ -868,10 +868,10 @@ agent-gateway/
 ├── docs/
 │   ├── design.md               ✅ 设计文档
 │   ├── dev.md                  ✅ 开发日志
-│   ├── TODO.md                 ✅ TODO 列表
+│   ├── guide.md                ✅ 用户指南
 │   ├── process.md              ✅ 本进度文档
 │   └── plugin/                 ✅ 插件系统文档（🆕 新增）
-│       └── README.md           ✅ 完整插件文档（生命周期/宿主函数/开发指南/Transform管道/架构图）
+│       └── index.md           ✅ 完整插件文档（生命周期/宿主函数/开发指南/Transform管道/架构图）
 └── scripts/                    ✅ 复制原生绑定脚本
 ```
 
@@ -987,6 +987,7 @@ agent-gateway/
 ```
 
 主要变更：
+
 - 新增 crates/agw-api/src/handlers/ 模块化 Handler
 - 新增 crates/agw-api/src/types/ DTO 类型定义
 - 新增 crates/agw-core/src/business/agent_config.rs Agent 自动配置

@@ -14,8 +14,13 @@ export default defineConfig({
       },
       {
         text: "模块",
-        link: "/core",
+        link: "/module",
         activeMatch: "/(core|cli|api|gui|core-ts|node-ts)",
+      },
+      {
+        text: "API",
+        link: "/api",
+        activeMatch: "/api/",
       },
       {
         text: "设计",
@@ -42,16 +47,22 @@ export default defineConfig({
           ],
         },
       ],
+      "/api/": [
+        {
+          text: "API 文档",
+          items: [{ text: "REST API", link: "/api/rest" }],
+        },
+      ],
       "/": [
         {
           text: "模块文档",
           items: [
-            { text: "agw-core", link: "/core" },
-            { text: "agw-cli", link: "/cli" },
-            { text: "agw-api", link: "/api" },
-            { text: "agw-gui", link: "/gui" },
-            { text: "@agent-gateway/core", link: "/core-ts" },
-            { text: "@agent-gateway/node", link: "/node-ts" },
+            { text: "agw-core", link: "/module/core" },
+            { text: "agw-cli", link: "/module/cli" },
+            { text: "agw-api", link: "/module/api" },
+            { text: "agw-gui", link: "/module/gui" },
+            { text: "@agent-gateway/core", link: "/module/core-ts" },
+            { text: "@agent-gateway/node", link: "/module/node-ts" },
           ],
         },
         {
@@ -72,8 +83,7 @@ export default defineConfig({
       },
     ],
     footer: {
-      message: "Released under the MIT License.",
-      copyright: "Copyright © 2024-present Agent Gateway",
+      message: "Copyright © 2026-present @veaba/agent-gateway",
     },
   },
   plugins: [pluginShiki()],

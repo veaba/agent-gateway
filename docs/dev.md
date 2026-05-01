@@ -342,5 +342,5 @@ curl -fsSL https://tauri.app/install.sh | bash
 ## 下一步
 
 - 阅读 [design.md](./design.md) 了解项目设计
-- 查看 [TODO.md](./TODO.md) 了解开发进度
+- 查看 [process.md](./process.md) 了解开发进度
 - 参考 CLAUDE.md 了解代码规范
