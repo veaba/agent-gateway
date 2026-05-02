@@ -14,8 +14,14 @@ pub fn setup_tray(app: &App) -> Result<(), Box<dyn std::error::Error>> {
         .items(&[&show_item, &quit_item])
         .build()?;
 
+    // 使用配置中指定的托盘图标
+    let icon = app
+        .default_window_icon()
+        .cloned()
+        .ok_or("default window icon not found")?;
+
     TrayIconBuilder::new()
-        .icon(app.default_window_icon().unwrap().clone())
+        .icon(icon)
         .tooltip("Agent Gateway")
         .menu(&menu)
         .show_menu_on_left_click(false)
