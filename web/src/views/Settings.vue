@@ -12,9 +12,12 @@
 
       <el-form label-position="top" class="settings-form">
         <el-form-item label="监听地址">
-          <el-input v-model="gatewaySettings.listen_address" placeholder="127.0.0.1:8080" clearable :disabled="gatewayRunning">
+          <el-input v-model="gatewaySettings.listenAddress" placeholder="127.0.0.1:8080" clearable
+            :disabled="gatewayRunning">
             <template #prefix>
-              <el-icon><Monitor /></el-icon>
+              <el-icon>
+                <Monitor />
+              </el-icon>
             </template>
           </el-input>
           <div class="form-tip">网关服务监听地址，修改后需重启生效</div>
@@ -22,11 +25,15 @@
 
         <el-form-item>
           <el-button v-if="!gatewayRunning" type="primary" :loading="gatewayLoading" @click="handleStartGateway">
-            <el-icon><VideoPlay /></el-icon>
+            <el-icon>
+              <VideoPlay />
+            </el-icon>
             启动网关
           </el-button>
           <el-button v-else type="danger" :loading="gatewayLoading" @click="handleStopGateway">
-            <el-icon><VideoPause /></el-icon>
+            <el-icon>
+              <VideoPause />
+            </el-icon>
             停止网关
           </el-button>
         </el-form-item>
@@ -42,7 +49,7 @@
 
       <el-form label-position="top" class="settings-form">
         <el-form-item label="日志级别">
-          <el-select v-model="settings.log_level" placeholder="选择日志级别" style="width: 100%">
+          <el-select v-model="settings.logLevel" placeholder="选择日志级别" style="width: 100%">
             <el-option label="Debug" value="debug" />
             <el-option label="Info" value="info" />
             <el-option label="Warning" value="warn" />
@@ -62,11 +69,15 @@
 
         <el-form-item>
           <el-button type="primary" :loading="saving" @click="handleSave">
-            <el-icon><Check /></el-icon>
+            <el-icon>
+              <Check />
+            </el-icon>
             保存设置
           </el-button>
           <el-button @click="loadSettings">
-            <el-icon><Refresh /></el-icon>
+            <el-icon>
+              <Refresh />
+            </el-icon>
             重置
           </el-button>
         </el-form-item>
@@ -107,7 +118,7 @@
         </div>
         <div class="about-item">
           <span class="about-label">API 端点</span>
-          <span class="about-value agw-mono">{{ gatewaySettings.listen_address }}</span>
+          <span class="about-value agw-mono">{{ gatewaySettings.listenAddress }}</span>
         </div>
       </div>
 
@@ -119,11 +130,15 @@
         </p>
         <div class="about-links">
           <el-button link type="primary" @click="openUrl('https://github.com')">
-            <el-icon><Link /></el-icon>
+            <el-icon>
+              <Link />
+            </el-icon>
             GitHub
           </el-button>
           <el-button link type="primary" @click="openUrl('https://docs.anthropic.com')">
-            <el-icon><Document /></el-icon>
+            <el-icon>
+              <Document />
+            </el-icon>
             文档
           </el-button>
         </div>
@@ -149,7 +164,7 @@ const { startGateway: doStartGateway, stopGateway: doStopGateway, getGatewayStat
 const { theme, setTheme } = useTheme()
 
 const settings = reactive({
-  log_level: 'info',
+  logLevel: 'info',
   theme: 'dark' as ThemeMode
 })
 
@@ -164,12 +179,12 @@ watch(() => settings.theme, (newTheme) => {
 })
 
 const gatewaySettings = reactive({
-  listen_address: '127.0.0.1:8080'
+  listenAddress: '127.0.0.1:8080'
 })
 
 const loadSettings = () => {
-  // Reset log_level only, theme is managed by useTheme
-  settings.log_level = 'info'
+  // Reset logLevel only, theme is managed by useTheme
+  settings.logLevel = 'info'
 }
 
 const handleSave = async () => {
@@ -180,7 +195,7 @@ const handleSave = async () => {
     // Save other settings
     const saved = localStorage.getItem('agw-settings') || '{}'
     const existing = JSON.parse(saved)
-    existing.log_level = settings.log_level
+    existing.logLevel = settings.logLevel
     localStorage.setItem('agw-settings', JSON.stringify(existing))
     ElMessage.success('设置已保存')
   } catch {
@@ -195,8 +210,8 @@ const loadSettingsFromStorage = () => {
     const saved = localStorage.getItem('agw-settings')
     if (saved) {
       const parsed = JSON.parse(saved)
-      if (parsed.log_level) {
-        settings.log_level = parsed.log_level
+      if (parsed.logLevel) {
+        settings.logLevel = parsed.logLevel
       }
       // Theme is loaded by useTheme composable
     }
@@ -208,7 +223,7 @@ const loadSettingsFromStorage = () => {
 const handleStartGateway = async () => {
   gatewayLoading.value = true
   try {
-    await doStartGateway(gatewaySettings.listen_address)
+    await doStartGateway(gatewaySettings.listenAddress)
     gatewayRunning.value = true
     ElMessage.success('网关已启动')
   } catch {
@@ -244,8 +259,8 @@ onMounted(async () => {
   await checkConnection()
   const status = await getGatewayStatus()
   gatewayRunning.value = status.running
-  if (status.listen_addr) {
-    gatewaySettings.listen_address = status.listen_addr
+  if (status.listenAddr) {
+    gatewaySettings.listenAddress = status.listenAddr
   }
 })
 </script>
@@ -260,8 +275,15 @@ onMounted(async () => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .settings-card {

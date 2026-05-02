@@ -4,7 +4,7 @@
       <h2 class="section-title">选择 Provider 开始配置</h2>
       <p class="section-desc">选择一个 Provider，我们将引导您完成配置</p>
       <div class="provider-grid">
-        <div v-for="provider in providers" :key="provider.provider_id" class="provider-card"
+        <div v-for="provider in providers" :key="provider.providerId" class="provider-card"
           @click="selectProvider(provider)">
           <div class="provider-icon">
             <el-icon :size="32">
@@ -36,29 +36,29 @@
 
       <div class="guide-actions">
         <div class="action-row">
-          <el-button v-if="selectedProvider.onboarding?.signup_url" type="primary"
-            @click="openUrl(selectedProvider.onboarding.signup_url)">
+          <el-button v-if="selectedProvider.onboarding?.signupUrl" type="primary"
+            @click="openUrl(selectedProvider.onboarding.signupUrl)">
             <el-icon>
               <Link />
             </el-icon>
             注册账号
           </el-button>
-          <el-button v-if="selectedProvider.onboarding?.get_key_url"
-            @click="openUrl(selectedProvider.onboarding.get_key_url)">
+          <el-button v-if="selectedProvider.onboarding?.getKeyUrl"
+            @click="openUrl(selectedProvider.onboarding.getKeyUrl)">
             <el-icon>
               <Key />
             </el-icon>
             获取 API Key
           </el-button>
-          <el-button v-if="selectedProvider.onboarding?.plans_comparison_url"
-            @click="openUrl(selectedProvider.onboarding.plans_comparison_url)">
+          <el-button v-if="selectedProvider.onboarding?.plansComparisonUrl"
+            @click="openUrl(selectedProvider.onboarding.plansComparisonUrl)">
             <el-icon>
               <DataLine />
             </el-icon>
             套餐对比
           </el-button>
-          <el-button v-if="selectedProvider.onboarding?.setup_guide_url"
-            @click="openUrl(selectedProvider.onboarding.setup_guide_url)">
+          <el-button v-if="selectedProvider.onboarding?.setupGuideUrl"
+            @click="openUrl(selectedProvider.onboarding.setupGuideUrl)">
             <el-icon>
               <Document />
             </el-icon>
@@ -67,18 +67,18 @@
         </div>
       </div>
 
-      <div v-if="selectedProvider.onboarding?.agent_setup_guides?.length" class="agent-guides">
+      <div v-if="selectedProvider.onboarding?.agentSetupGuides?.length" class="agent-guides">
         <h3 class="guide-subtitle">Agent 工具配置</h3>
-        <div v-for="guide in selectedProvider.onboarding.agent_setup_guides" :key="guide.agent_id"
+        <div v-for="guide in selectedProvider.onboarding.agentSetupGuides" :key="guide.agentId"
           class="agent-guide-card">
           <div class="agent-guide-header">
-            <h4>{{ guide.agent_name }}</h4>
-            <el-tag v-if="guide.auto_config_supported" type="success" size="small">支持自动配置</el-tag>
+            <h4>{{ guide.agentName }}</h4>
+            <el-tag v-if="guide.autoConfigSupported" type="success" size="small">支持自动配置</el-tag>
           </div>
 
-          <div v-if="guide.env_vars.length" class="env-vars">
+          <div v-if="guide.envVars.length" class="env-vars">
             <h5>环境变量</h5>
-            <div v-for="env in guide.env_vars" :key="env.name" class="env-var-item">
+            <div v-for="env in guide.envVars" :key="env.name" class="env-var-item">
               <code class="env-var-name">{{ env.name }}</code>
               <code class="env-var-value">{{ env.value }}</code>
               <span class="env-var-desc">{{ env.description }}</span>
@@ -90,14 +90,14 @@
             </div>
           </div>
 
-          <div v-if="guide.manual_steps.length" class="steps">
+          <div v-if="guide.manualSteps.length" class="steps">
             <h5>配置步骤</h5>
-            <el-steps direction="vertical" :active="guide.manual_steps.length" finish-status="success">
-              <el-step v-for="step in guide.manual_steps" :key="step.step_number" :title="step.description">
-                <template v-if="step.command || step.copyable_text" #description>
+            <el-steps direction="vertical" :active="guide.manualSteps.length" finish-status="success">
+              <el-step v-for="step in guide.manualSteps" :key="step.stepNumber" :title="step.description">
+                <template v-if="step.command || step.copyableText" #description>
                   <div class="step-detail">
                     <code v-if="step.command" class="step-command">{{ step.command }}</code>
-                    <el-button v-if="step.copyable_text" size="small" text @click="copyText(step.copyable_text)">
+                    <el-button v-if="step.copyableText" size="small" text @click="copyText(step.copyableText)">
                       <el-icon>
                         <CopyDocument />
                       </el-icon> 复制
@@ -109,40 +109,40 @@
             </el-steps>
           </div>
 
-          <div v-if="guide.auto_config_supported" class="auto-config-section">
-            <el-button type="primary" :loading="autoConfigLoading === guide.agent_id"
-              @click="handleAutoConfig(guide.agent_id)">
+          <div v-if="guide.autoConfigSupported" class="auto-config-section">
+            <el-button type="primary" :loading="autoConfigLoading === guide.agentId"
+              @click="handleAutoConfig(guide.agentId)">
               <el-icon>
                 <MagicStick />
               </el-icon>
-              一键自动配置 {{ guide.agent_name }}
+              一键自动配置 {{ guide.agentName }}
             </el-button>
           </div>
 
-          <div v-if="autoConfigResult[guide.agent_id]" class="config-result">
-            <el-alert :title="autoConfigResult[guide.agent_id].success ? '配置成功' : '配置失败'"
-              :type="autoConfigResult[guide.agent_id].success ? 'success' : 'error'"
-              :description="autoConfigResult[guide.agent_id].message" show-icon closable />
-            <div v-if="autoConfigResult[guide.agent_id]?.report" class="report-details">
-              <p v-for="path in autoConfigResult[guide.agent_id]?.report?.paths ?? []" :key="path">
+          <div v-if="autoConfigResult[guide.agentId]" class="config-result">
+            <el-alert :title="autoConfigResult[guide.agentId].success ? '配置成功' : '配置失败'"
+              :type="autoConfigResult[guide.agentId].success ? 'success' : 'error'"
+              :description="autoConfigResult[guide.agentId].message" show-icon closable />
+            <div v-if="autoConfigResult[guide.agentId]?.report" class="report-details">
+              <p v-for="path in autoConfigResult[guide.agentId]?.report?.paths ?? []" :key="path">
                 <el-icon>
                   <Document />
                 </el-icon> {{ path }}
               </p>
-              <p v-if="autoConfigResult[guide.agent_id]?.report?.reload_command">
+              <p v-if="autoConfigResult[guide.agentId]?.report?.reloadCommand">
                 <el-icon>
                   <Refresh />
                 </el-icon>
-                执行以生效: <code>{{ autoConfigResult[guide.agent_id]?.report?.reload_command }}</code>
+                执行以生效: <code>{{ autoConfigResult[guide.agentId]?.report?.reloadCommand }}</code>
               </p>
             </div>
           </div>
 
           <div class="config-paths">
             <h5>配置文件路径</h5>
-            <p v-if="guide.config_file_paths.macos">macOS: <code>{{ guide.config_file_paths.macos }}</code></p>
-            <p v-if="guide.config_file_paths.linux">Linux: <code>{{ guide.config_file_paths.linux }}</code></p>
-            <p v-if="guide.config_file_paths.windows">Windows: <code>{{ guide.config_file_paths.windows }}</code></p>
+            <p v-if="guide.configFilePaths.macos">macOS: <code>{{ guide.configFilePaths.macos }}</code></p>
+            <p v-if="guide.configFilePaths.linux">Linux: <code>{{ guide.configFilePaths.linux }}</code></p>
+            <p v-if="guide.configFilePaths.windows">Windows: <code>{{ guide.configFilePaths.windows }}</code></p>
           </div>
         </div>
       </div>
@@ -151,7 +151,7 @@
         <el-empty description="该 Provider 暂无配置引导" />
         <p class="help-text">
           您可以参考
-          <el-link v-if="selectedProvider.docs_url" type="primary" @click="openUrl(selectedProvider.docs_url)">
+          <el-link v-if="selectedProvider.docsUrl" type="primary" @click="openUrl(selectedProvider.docsUrl)">
             {{ selectedProvider.name }} 文档
           </el-link>
           进行手动配置。
@@ -180,8 +180,8 @@ interface AutoConfigResult {
     agent: string
     method: string
     paths: string[]
-    requires_reload: boolean
-    reload_command?: string
+    requiresReload: boolean
+    reloadCommand?: string
   }
 }
 
@@ -217,15 +217,15 @@ const handleAutoConfig = async (agentId: string) => {
         agent: string
         method: string
         paths: string[]
-        requires_reload: boolean
-        reload_command: string | null
-      }>('auto_config_agent', { agentId, gatewayAddr: null })
+        requiresReload: boolean
+        reloadCommand: string | null
+      }>('autoConfigAgent', { agentId, gatewayAddr: null })
       autoConfigResult.value[agentId] = {
         success: true,
         message: `${report.agent} 配置成功，方法: ${report.method}`,
         report: {
           ...report,
-          reload_command: report.reload_command || undefined,
+          reloadCommand: report.reloadCommand || undefined,
         },
       }
     } else {

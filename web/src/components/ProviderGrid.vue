@@ -1,19 +1,16 @@
 <template>
   <div class="provider-grid">
-    <div
-      v-for="provider in providers"
-      :key="provider.provider_id"
-      class="provider-card"
-      :class="{ selected: isSelected(provider) }"
-      @click="handleSelect(provider)"
-    >
+    <div v-for="provider in providers" :key="provider.providerId" class="provider-card"
+      :class="{ selected: isSelected(provider) }" @click="handleSelect(provider)">
       <div class="provider-icon">
-        <el-icon :size="32"><Connection /></el-icon>
+        <el-icon :size="32">
+          <Connection />
+        </el-icon>
       </div>
       <div class="provider-name">{{ provider.name }}</div>
       <div class="provider-desc">{{ provider.description }}</div>
       <div class="provider-plans">
-        <el-tag v-for="plan in provider.coding_plans" :key="plan.plan_id" size="small">
+        <el-tag v-for="plan in provider.codingPlans" :key="plan.planId" size="small">
           {{ plan.name }}
         </el-tag>
       </div>
@@ -34,7 +31,7 @@ const emit = defineEmits<{
 }>()
 
 const isSelected = (provider: Provider) => {
-  return props.selected?.provider_id === provider.provider_id
+  return props.selected?.providerIId === provider.providerId
 }
 
 const handleSelect = (provider: Provider) => {

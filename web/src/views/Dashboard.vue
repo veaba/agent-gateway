@@ -3,11 +3,13 @@
     <!-- Stats Cards -->
     <el-row :gutter="20" class="stats-row agw-stagger">
       <el-col :xs="24" :sm="12" :lg="6">
-        <div class="stat-card stat-card-cyan">
+        <div class="stat-card stat-card-cyan ">
           <div class="stat-icon">
-            <el-icon :size="28"><Connection /></el-icon>
+            <el-icon :size="28">
+              <Connection />
+            </el-icon>
           </div>
-          <div class="stat-content">
+          <div class="stat-content ">
             <div class="stat-value agw-mono">{{ stats.plans }}</div>
             <div class="stat-label">已配置套餐</div>
           </div>
@@ -15,19 +17,22 @@
         </div>
       </el-col>
       <el-col :xs="24" :sm="12" :lg="6">
-        <div class="stat-card stat-card-emerald">
+        <div class="stat-card stat-card-emerald ">
           <div class="stat-icon">
-            <el-icon :size="28"><PieChart /></el-icon>
+            <el-icon :size="28">
+              <PieChart />
+            </el-icon>
           </div>
-          <div class="stat-content">
+
+          <div class="stat-content ">
             <div class="stat-value agw-mono">{{ stats.quotaUsedPercent }}%</div>
-            <div class="stat-label">配额使用率</div>
-            <el-progress
-              :percentage="stats.quotaUsedPercent"
-              :stroke-width="5"
-              :show-text="false"
-              class="stat-progress"
-            />
+            <div class='flex quota-progress'>
+              <div class="stat-label">配额使用率</div>
+              <div class='flex-1 ml-2'>
+                <el-progress :percentage="2 || stats.quotaUsedPercent || 1" :stroke-width="5" :show-text="false"
+                  class="stat-progress" />
+              </div>
+            </div>
           </div>
           <div class="stat-glow"></div>
         </div>
@@ -35,17 +40,14 @@
       <el-col :xs="24" :sm="12" :lg="6">
         <div class="stat-card" :class="stats.healthStatus === 'healthy' ? 'stat-card-emerald' : 'stat-card-rose'">
           <div class="stat-icon">
-            <el-icon :size="28"><CircleCheck /></el-icon>
+            <el-icon :size="28">
+              <CircleCheck />
+            </el-icon>
           </div>
           <div class="stat-content">
             <div class="stat-value">
-              <el-tag
-                :type="stats.healthStatus === 'healthy' ? 'success' : 'danger'"
-                effect="dark"
-                round
-                size="small"
-                class="health-tag"
-              >
+              <el-tag :type="stats.healthStatus === 'healthy' ? 'success' : 'danger'" effect="dark" round size="small"
+                class="health-tag">
                 {{ stats.healthStatus === 'healthy' ? '正常' : '异常' }}
               </el-tag>
             </div>
@@ -57,7 +59,9 @@
       <el-col :xs="24" :sm="12" :lg="6">
         <div class="stat-card stat-card-sky">
           <div class="stat-icon">
-            <el-icon :size="28"><TrendCharts /></el-icon>
+            <el-icon :size="28">
+              <TrendCharts />
+            </el-icon>
           </div>
           <div class="stat-content">
             <div class="stat-value agw-mono">{{ stats.requestsToday.toLocaleString() }}</div>
@@ -76,54 +80,48 @@
             <span class="card-title">最近的请求</span>
             <div class="card-actions">
               <el-button text size="small" @click="loadLogs">
-                <el-icon><Refresh /></el-icon>
+                <el-icon>
+                  <Refresh />
+                </el-icon>
                 刷新
               </el-button>
               <el-button text size="small" @click="$router.push('/logs')">
                 查看全部
-                <el-icon class="el-icon--right"><ArrowRight /></el-icon>
+                <el-icon class="el-icon--right">
+                  <ArrowRight />
+                </el-icon>
               </el-button>
             </div>
           </div>
-          <el-table
-            :data="recentRequests"
-            class="dashboard-table"
-            :row-class-name="getRowClass"
-            v-loading="loading.logs"
-            stripe
-          >
+          <el-table :data="recentRequests" class="dashboard-table" :row-class-name="getRowClass"
+            v-loading="loading.logs" stripe>
             <el-table-column prop="timestamp" label="时间" width="90">
               <template #default="{ row }">
                 <span class="agw-mono">{{ formatTime(row.timestamp) }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="plan_id" label="套餐" min-width="100">
+            <el-table-column prop="planId" label="套餐" min-width="100">
               <template #default="{ row }">
-                <span class="plan-name">{{ getPlanName(row.plan_id) }}</span>
+                <span class="plan-name">{{ getPlanName(row.planId) }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="agent_id" label="Agent" width="110" />
-            <el-table-column prop="model_id" label="模型" min-width="100">
+            <el-table-column prop="agentId" label="Agent" width="110" />
+            <el-table-column prop="modelId" label="模型" min-width="100">
               <template #default="{ row }">
-                <span class="model-badge">{{ row.model_id }}</span>
+                <span class="model-badge">{{ row.modelId || '-' }}</span>
               </template>
             </el-table-column>
             <el-table-column label="状态" width="70" align="center">
               <template #default="{ row }">
-                <el-tag
-                  :type="getStatusType(row.status_code)"
-                  size="small"
-                  round
-                  class="status-tag"
-                >
-                  {{ row.status_code || '—' }}
+                <el-tag :type="getStatusType(row.statusCode)" size="small" round class="status-tag">
+                  {{ row.statusCode || '—' }}
                 </el-tag>
               </template>
             </el-table-column>
             <el-table-column label="延迟" width="80" align="right">
               <template #default="{ row }">
-                <span class="latency-value agw-mono" :class="{ 'latency-high': row.latency_ms > 500 }">
-                  {{ row.latency_ms ? `${row.latency_ms}ms` : '—' }}
+                <span class="latency-value agw-mono" :class="{ 'latency-high': row.latencyMs > 500 }">
+                  {{ row.latencyMs ? `${row.latencyMs}ms` : '—' }}
                 </span>
               </template>
             </el-table-column>
@@ -138,43 +136,59 @@
           <div class="quick-actions">
             <div class="action-item action-primary" @click="$router.push('/plans/add')">
               <div class="action-icon">
-                <el-icon :size="22"><Plus /></el-icon>
+                <el-icon :size="22">
+                  <Plus />
+                </el-icon>
               </div>
               <div class="action-content">
                 <div class="action-title">添加新套餐</div>
                 <div class="action-desc">配置新的 AI 服务</div>
               </div>
-              <el-icon class="action-arrow"><ArrowRight /></el-icon>
+              <el-icon class="action-arrow">
+                <ArrowRight />
+              </el-icon>
             </div>
             <div class="action-item" @click="$router.push('/plans')">
               <div class="action-icon">
-                <el-icon :size="22"><Connection /></el-icon>
+                <el-icon :size="22">
+                  <Connection />
+                </el-icon>
               </div>
               <div class="action-content">
                 <div class="action-title">管理套餐</div>
                 <div class="action-desc">编辑或删除现有套餐</div>
               </div>
-              <el-icon class="action-arrow"><ArrowRight /></el-icon>
+              <el-icon class="action-arrow">
+                <ArrowRight />
+              </el-icon>
             </div>
             <div class="action-item" @click="$router.push('/fallback')">
               <div class="action-icon">
-                <el-icon :size="22"><RefreshLeft /></el-icon>
+                <el-icon :size="22">
+                  <RefreshLeft />
+                </el-icon>
               </div>
               <div class="action-content">
                 <div class="action-title">配置降级策略</div>
                 <div class="action-desc">设置自动故障转移</div>
               </div>
-              <el-icon class="action-arrow"><ArrowRight /></el-icon>
+              <el-icon class="action-arrow">
+                <ArrowRight />
+              </el-icon>
             </div>
             <div class="action-item" @click="$router.push('/quota')">
               <div class="action-icon">
-                <el-icon :size="22"><DataLine /></el-icon>
+                <el-icon :size="22">
+                  <DataLine />
+                </el-icon>
               </div>
               <div class="action-content">
                 <div class="action-title">查看配额</div>
                 <div class="action-desc">监控使用量与限额</div>
               </div>
-              <el-icon class="action-arrow"><ArrowRight /></el-icon>
+              <el-icon class="action-arrow">
+                <ArrowRight />
+              </el-icon>
             </div>
           </div>
         </div>
@@ -185,20 +199,19 @@
             <span class="card-title">配额概览</span>
           </div>
           <div class="quota-list" v-loading="loading.quota">
-            <div v-for="quota in quotaSummary" :key="quota.plan_id" class="quota-item" :class="{ 'quota-alert': quota.alert }">
+            <div v-for="quota in quotaSummary" :key="quota.planId" class="quota-item"
+              :class="{ 'quota-alert': quota.alert }">
               <div class="quota-plan">
                 <span class="quota-plan-name">
-                  <el-icon v-if="quota.alert" class="alert-icon"><Warning /></el-icon>
-                  {{ getPlanName(quota.plan_id) }}
+                  <el-icon v-if="quota.alert" class="alert-icon">
+                    <Warning />
+                  </el-icon>
+                  {{ getPlanName(quota.planId) }}
                 </span>
                 <span class="quota-percent agw-mono" :class="{ 'text-alert': quota.alert }">{{ quota.percent }}%</span>
               </div>
-              <el-progress
-                :percentage="quota.percent"
-                :stroke-width="6"
-                :show-text="false"
-                :color="getQuotaColor(quota.percent)"
-              />
+              <el-progress :percentage="quota.percent" :stroke-width="6" :show-text="false"
+                :color="getQuotaColor(quota.percent)" />
             </div>
             <el-empty v-if="quotaSummary.length === 0 && !loading.quota" description="暂无配额数据" :image-size="60" />
           </div>
@@ -212,6 +225,8 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { fetchPlans, fetchQuotaStatus, fetchLogs, healthCheck } from '@/api'
 import type { UserPlan, QuotaStatus, RequestLog } from '@/types'
+
+const format = (percentage) => (percentage === 100 ? 'Full' : `${percentage}%`)
 
 // Loading states
 const loading = reactive({
@@ -229,11 +244,11 @@ const isHealthy = ref(false)
 
 // Stats computed
 const stats = computed(() => {
-  const totalQuotaUsed = quotas.value.reduce((sum, q) => sum + (q.usage?.daily_used ?? 0), 0)
+  const totalQuotaUsed = quotas.value.reduce((sum, q) => sum + (q.usage?.dailyUsed ?? 0), 0)
   const totalQuotaLimit = quotas.value.reduce((sum, q) => sum + (q.limits?.daily ?? 1), 0)
   const quotaPercent = totalQuotaLimit > 0 ? Math.floor((totalQuotaUsed / totalQuotaLimit) * 100) : 0
 
-  const healthyPlans = plans.value.filter(p => p.health_status === 'healthy').length
+  const healthyPlans = plans.value.filter(p => p.healthStatus === 'healthy').length
   const healthStatus = plans.value.length === 0 ? 'unknown' : (healthyPlans === plans.value.length ? 'healthy' : 'error')
 
   const todayRequests = logs.value.length
@@ -255,8 +270,8 @@ const recentRequests = computed(() => {
 // Quota summary for sidebar
 const quotaSummary = computed(() => {
   return quotas.value.map(q => ({
-    plan_id: q.plan_id,
-    percent: q.limits?.daily ? Math.floor(((q.usage?.daily_used ?? 0) / q.limits.daily) * 100) : 0,
+    planId: q.planId,
+    percent: q.limits?.daily ? Math.floor(((q.usage?.dailyUsed ?? 0) / q.limits.daily) * 100) : 0,
     alert: q.alert
   }))
 })
@@ -287,8 +302,8 @@ const formatTime = (timestamp: string) => {
 }
 
 const getRowClass = ({ row }: { row: RequestLog }) => {
-  if (!row.status_code) return ''
-  return row.status_code >= 200 && row.status_code < 300 ? 'success-row' : 'error-row'
+  if (!row.statusCode) return ''
+  return row.statusCode >= 200 && row.statusCode < 300 ? 'success-row' : 'error-row'
 }
 
 // Data loading
@@ -342,8 +357,15 @@ onMounted(() => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Stats Row ── */
@@ -404,6 +426,7 @@ onMounted(() => {
 .stat-content {
   flex: 1;
   min-width: 0;
+
 }
 
 .stat-value {
@@ -438,10 +461,21 @@ onMounted(() => {
   pointer-events: none;
 }
 
-.stat-card-cyan .stat-glow { background: #0ea5e9; }
-.stat-card-emerald .stat-glow { background: #10b981; }
-.stat-card-sky .stat-glow { background: #22d3ee; }
-.stat-card-rose .stat-glow { background: #f43f5e; }
+.stat-card-cyan .stat-glow {
+  background: #0ea5e9;
+}
+
+.stat-card-emerald .stat-glow {
+  background: #10b981;
+}
+
+.stat-card-sky .stat-glow {
+  background: #22d3ee;
+}
+
+.stat-card-rose .stat-glow {
+  background: #f43f5e;
+}
 
 /* ── Content Row ── */
 .content-row {

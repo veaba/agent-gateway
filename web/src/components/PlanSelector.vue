@@ -1,12 +1,7 @@
 <template>
   <div class="plan-selector">
-    <div
-      v-for="plan in plans"
-      :key="plan.plan_id"
-      class="plan-item"
-      :class="{ selected: isSelected(plan.plan_id) }"
-      @click="handleSelect(plan.plan_id)"
-    >
+    <div v-for="plan in plans" :key="plan.planId" class="plan-item" :class="{ selected: isSelected(plan.planId) }"
+      @click="handleSelect(plan.planId)">
       <div class="plan-header">
         <span class="plan-name">{{ plan.name }}</span>
         <el-tag v-if="plan.tier === 'pro'" type="warning" size="small">推荐</el-tag>
@@ -14,18 +9,22 @@
       <div class="plan-price">{{ plan.price || '自定义' }}</div>
       <div class="plan-desc">{{ plan.description }}</div>
       <div class="plan-features">
-        <div v-if="plan.quota_daily" class="feature">
-          <el-icon><Calendar /></el-icon>
-          {{ plan.quota_daily }}次/日
+        <div v-if="plan.quotaDaily" class="feature">
+          <el-icon>
+            <Calendar />
+          </el-icon>
+          {{ plan.quotaDaily }}次/日
         </div>
-        <div v-if="plan.rpm_limit" class="feature">
-          <el-icon><Timer /></el-icon>
-          {{ plan.rpm_limit }} RPM
+        <div v-if="plan.rpmLimit" class="feature">
+          <el-icon>
+            <Timer />
+          </el-icon>
+          {{ plan.rpmLimit }} RPM
         </div>
       </div>
       <div class="plan-models">
         <span class="label">支持模型:</span>
-        {{ plan.supported_model_ids.join(', ') }}
+        {{ plan.supportedModelIds.join(', ') }}
       </div>
     </div>
   </div>

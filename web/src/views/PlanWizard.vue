@@ -25,50 +25,44 @@
       <!-- Step 2: 选择 Plan -->
       <div v-show="currentStep === 1" class="step-content">
         <h3 class="step-title">选择 {{ selectedProvider?.name }} 的套餐</h3>
-        <PlanSelector
-          v-if="selectedProvider"
-          :plans="selectedProvider.coding_plans"
-          :selected="selectedPlanId"
-          @select="handlePlanSelect"
-        />
+        <PlanSelector v-if="selectedProvider" :plans="selectedProvider.codingPlans" :selected="selectedPlanId"
+          @select="handlePlanSelect" />
       </div>
 
       <!-- Step 3: 选择 Agent -->
       <div v-show="currentStep === 2" class="step-content">
         <h3 class="step-title">选择要绑定的 Agent 工具</h3>
-        <AgentSelector
-          v-if="selectedPlan"
-          :agents="availableAgents"
-          :selected="selectedAgents"
-          @select="handleAgentSelect"
-        />
+        <AgentSelector v-if="selectedPlan" :agents="availableAgents" :selected="selectedAgents"
+          @select="handleAgentSelect" />
       </div>
 
       <!-- Step 4: 配置 API Key -->
       <div v-show="currentStep === 3" class="step-content">
         <h3 class="step-title">配置 API Key</h3>
-        <ApiKeyInput
-          v-if="selectedProvider"
-          :provider="selectedProvider"
-          v-model="apiKey"
-          @open-page="handleOpenKeyPage"
-        />
+        <ApiKeyInput v-if="selectedProvider" :provider="selectedProvider" v-model="apiKey"
+          @open-page="handleOpenKeyPage" />
       </div>
 
       <!-- Step 5: 完成 -->
       <div v-show="currentStep === 4" class="step-content step-complete">
         <div class="success-animation">
-          <el-icon :size="80" class="success-icon"><CircleCheck /></el-icon>
+          <el-icon :size="80" class="success-icon">
+            <CircleCheck />
+          </el-icon>
         </div>
         <h3 class="complete-title">配置完成</h3>
         <p class="complete-desc">套餐 "{{ planName }}" 已成功配置</p>
         <div class="complete-actions">
           <el-button type="primary" size="large" @click="$router.push('/plans')">
-            <el-icon><HomeFilled /></el-icon>
+            <el-icon>
+              <HomeFilled />
+            </el-icon>
             返回套餐列表
           </el-button>
           <el-button size="large" @click="resetWizard">
-            <el-icon><Plus /></el-icon>
+            <el-icon>
+              <Plus />
+            </el-icon>
             添加另一个
           </el-button>
         </div>
@@ -77,16 +71,22 @@
 
     <div class="wizard-footer" v-if="currentStep < 4">
       <el-button v-if="currentStep > 0" size="large" @click="prevStep">
-        <el-icon><ArrowLeft /></el-icon>
+        <el-icon>
+          <ArrowLeft />
+        </el-icon>
         上一步
       </el-button>
       <el-button v-if="currentStep < 3" type="primary" size="large" :disabled="!canNext" @click="nextStep">
         下一步
-        <el-icon><ArrowRight /></el-icon>
+        <el-icon>
+          <ArrowRight />
+        </el-icon>
       </el-button>
       <el-button v-if="currentStep === 3" type="primary" size="large" :disabled="!apiKey" @click="finishWizard">
         完成配置
-        <el-icon><Check /></el-icon>
+        <el-icon>
+          <Check />
+        </el-icon>
       </el-button>
     </div>
   </div>
@@ -114,14 +114,14 @@ const apiKey = ref('')
 const planName = ref('')
 
 const selectedPlan = computed(() => {
-  if (!selectedProvider.value?.coding_plans) return null
-  return selectedProvider.value.coding_plans.find(p => p.plan_id === selectedPlanId.value)
+  if (!selectedProvider.value?.codingPlans) return null
+  return selectedProvider.value.codingPlans.find(p => p.planId === selectedPlanId.value)
 })
 
 const availableAgents = computed(() => {
-  if (!selectedPlan.value || !selectedProvider.value?.supported_agents) return []
-  return selectedProvider.value.supported_agents.filter(
-    a => selectedPlan.value!.supported_agent_ids?.includes(a.agent_id)
+  if (!selectedPlan.value || !selectedProvider.value?.supportedAgents) return []
+  return selectedProvider.value.supportedAgents.filter(
+    a => selectedPlan.value!.supportedAgentIds?.includes(a.agentId)
   )
 })
 
@@ -147,8 +147,8 @@ const handleAgentSelect = (agentIds: string[]) => {
 }
 
 const handleOpenKeyPage = () => {
-  if (selectedProvider.value?.get_api_key_url) {
-    window.open(selectedProvider.value.get_api_key_url, '_blank')
+  if (selectedProvider.value?.getApiKeyUrl) {
+    window.open(selectedProvider.value.getApiKeyUrl, '_blank')
   }
 }
 
@@ -164,15 +164,15 @@ const finishWizard = async () => {
   try {
     planName.value = `${selectedProvider.value?.name} ${selectedPlan.value?.name}`
     await createPlan({
-      provider_id: selectedProvider.value!.provider_id,
-      plan_id: selectedPlanId.value,
+      providerId: selectedProvider.value!.providerId,
+      planId: selectedPlanId.value,
       name: planName.value,
-      api_key: apiKey.value,
-      selected_model_id: selectedPlan.value!.default_model_id,
-      bound_agents: selectedAgents.value.map(id => ({
-        agent_id: id,
+      apiKey: apiKey.value,
+      selectedModelId: selectedPlan.value!.defaultModelId,
+      boundAgents: selectedAgents.value.map(id => ({
+        agentId: id,
         configured: false,
-        config_status: 'not_configured'
+        configStatus: 'notConfigured'
       }))
     })
     currentStep.value = 4
@@ -207,8 +207,15 @@ onMounted(async () => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .wizard-header {
@@ -251,8 +258,15 @@ onMounted(async () => {
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .step-title {
@@ -278,8 +292,15 @@ onMounted(async () => {
 }
 
 @keyframes scaleIn {
-  from { transform: scale(0); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .complete-title {

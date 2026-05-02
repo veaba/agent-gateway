@@ -8,7 +8,9 @@
       </div>
       <div class="header-actions">
         <el-button @click="loadAllData">
-          <el-icon><Refresh /></el-icon>
+          <el-icon>
+            <Refresh />
+          </el-icon>
           刷新
         </el-button>
       </div>
@@ -19,7 +21,9 @@
       <el-col :xs="12" :sm="6">
         <div class="stat-card stat-card-rose">
           <div class="stat-icon">
-            <el-icon :size="24"><Warning /></el-icon>
+            <el-icon :size="24">
+              <Warning />
+            </el-icon>
           </div>
           <div class="stat-content">
             <div class="stat-value agw-mono">{{ stats.totalEvents }}</div>
@@ -31,7 +35,9 @@
       <el-col :xs="12" :sm="6">
         <div class="stat-card stat-card-emerald">
           <div class="stat-icon">
-            <el-icon :size="24"><CircleCheck /></el-icon>
+            <el-icon :size="24">
+              <CircleCheck />
+            </el-icon>
           </div>
           <div class="stat-content">
             <div class="stat-value agw-mono">{{ stats.totalResolved }}</div>
@@ -43,7 +49,9 @@
       <el-col :xs="12" :sm="6">
         <div class="stat-card stat-card-amber">
           <div class="stat-icon">
-            <el-icon :size="24"><Clock /></el-icon>
+            <el-icon :size="24">
+              <Clock />
+            </el-icon>
           </div>
           <div class="stat-content">
             <div class="stat-value agw-mono">{{ stats.totalUnresolved }}</div>
@@ -55,7 +63,9 @@
       <el-col :xs="12" :sm="6">
         <div class="stat-card stat-card-blue">
           <div class="stat-icon">
-            <el-icon :size="24"><Timer /></el-icon>
+            <el-icon :size="24">
+              <Timer />
+            </el-icon>
           </div>
           <div class="stat-content">
             <div class="stat-value agw-mono">
@@ -86,15 +96,17 @@
             </el-form-item>
 
             <el-form-item label="最大重试次数">
-              <el-input-number v-model="config.max_attempts" :min="1" :max="5" />
+              <el-input-number v-model="config.maxAttempts" :min="1" :max="5" />
             </el-form-item>
 
             <el-form-item label="优先级顺序">
-              <el-select v-model="config.priority_order" multiple placeholder="拖拽排序选择套餐" class="priority-select">
+              <el-select v-model="config.priorityOrder" multiple placeholder="拖拽排序选择套餐" class="priority-select">
                 <el-option v-for="plan in plans" :key="plan.id" :label="plan.name" :value="plan.id" />
               </el-select>
-              <div class="priority-hint" v-if="(config.priority_order?.length ?? 0) > 0">
-                <el-icon :size="12"><InfoFilled /></el-icon>
+              <div class="priority-hint" v-if="(config.priorityOrder?.length ?? 0) > 0">
+                <el-icon :size="12">
+                  <InfoFilled />
+                </el-icon>
                 排列顺序即为降级优先级，首选项为最优先
               </div>
             </el-form-item>
@@ -127,12 +139,8 @@
                   </span>
                 </div>
               </div>
-              <el-progress
-                :percentage="stats.totalEvents > 0 ? Math.round((item.count / stats.totalEvents) * 100) : 0"
-                :stroke-width="8"
-                :show-text="false"
-                :color="getTriggerColor(item.triggerType)"
-              />
+              <el-progress :percentage="stats.totalEvents > 0 ? Math.round((item.count / stats.totalEvents) * 100) : 0"
+                :stroke-width="8" :show-text="false" :color="getTriggerColor(item.triggerType)" />
             </div>
           </div>
           <el-empty v-else-if="!loading.stats" description="暂无降级事件数据" :image-size="60" />
@@ -156,31 +164,24 @@
         </el-table-column>
         <el-table-column label="健康分" width="90" align="center">
           <template #default="{ row }">
-            <el-tag
-              :type="row.healthScore >= 80 ? 'success' : row.healthScore >= 60 ? 'warning' : 'danger'"
-              size="small"
-              round
-              class="rate-tag"
-            >
+            <el-tag :type="row.healthScore >= 80 ? 'success' : row.healthScore >= 60 ? 'warning' : 'danger'"
+              size="small" round class="rate-tag">
               {{ Math.round(row.healthScore) }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column label="降级率" width="90" align="center">
           <template #default="{ row }">
-            <span class="agw-mono" :class="{ 'text-rose': row.fallbackRate > 0.1, 'text-amber': row.fallbackRate > 0.05 }">
+            <span class="agw-mono"
+              :class="{ 'text-rose': row.fallbackRate > 0.1, 'text-amber': row.fallbackRate > 0.05 }">
               {{ (row.fallbackRate * 100).toFixed(1) }}%
             </span>
           </template>
         </el-table-column>
         <el-table-column label="成功率" width="90" align="center">
           <template #default="{ row }">
-            <el-tag
-              :type="row.successRate >= 0.95 ? 'success' : row.successRate >= 0.9 ? 'warning' : 'danger'"
-              size="small"
-              round
-              class="rate-tag"
-            >
+            <el-tag :type="row.successRate >= 0.95 ? 'success' : row.successRate >= 0.9 ? 'warning' : 'danger'"
+              size="small" round class="rate-tag">
               {{ (row.successRate * 100).toFixed(1) }}%
             </el-tag>
           </template>
@@ -236,12 +237,7 @@
         </el-table-column>
         <el-table-column label="触发原因" width="120">
           <template #default="{ row }">
-            <el-tag
-              :type="getTriggerTagType(row.triggerType)"
-              size="small"
-              effect="dark"
-              round
-            >
+            <el-tag :type="getTriggerTagType(row.triggerType)" size="small" effect="dark" round>
               {{ formatTriggerType(row.triggerType) }}
             </el-tag>
           </template>
@@ -317,8 +313,8 @@ import {
 
 const config = ref<FallbackConfig>({
   enabled: true,
-  max_attempts: 3,
-  priority_order: []
+  maxAttempts: 3,
+  priorityOrder: []
 })
 const plans = ref<UserPlan[]>([])
 const events = ref<FallbackEvent[]>([])
@@ -351,8 +347,8 @@ const loadConfig = async () => {
     ])
     config.value = {
       enabled: fallbackConfig.enabled ?? true,
-      max_attempts: fallbackConfig.max_attempts ?? 3,
-      priority_order: fallbackConfig.priority_order ?? []
+      maxAttempts: fallbackConfig.maxAttempts ?? 3,
+      priorityOrder: fallbackConfig.priorityOrder ?? []
     }
     plans.value = planList
   } catch {
@@ -427,33 +423,33 @@ watch([filterPlanId, eventLimit], () => {
 
 const formatTriggerType = (type: string) => {
   const map: Record<string, string> = {
-    rate_limit: '速率限制',
-    server_error: '服务端错误',
-    connection_failure: '连接失败',
+    rateLimit: '速率限制',
+    serverError: '服务端错误',
+    connectionFailure: '连接失败',
     timeout: '请求超时',
-    quota_exceeded: '配额耗尽'
+    quotaExceeded: '配额耗尽'
   }
   return map[type] || type
 }
 
 const getTriggerColor = (type: string) => {
   const map: Record<string, string> = {
-    rate_limit: '#f59e0b',
-    server_error: '#f43f5e',
-    connection_failure: '#8b5cf6',
+    rateLimit: '#f59e0b',
+    serverError: '#f43f5e',
+    connectionFailure: '#8b5cf6',
     timeout: '#06b6d4',
-    quota_exceeded: '#10b981'
+    quotaExceeded: '#10b981'
   }
   return map[type] || '#6b7280'
 }
 
 const getTriggerTagType = (type: string) => {
   const map: Record<string, string> = {
-    rate_limit: 'warning',
-    server_error: 'danger',
-    connection_failure: '',
+    rateLimit: 'warning',
+    serverError: 'danger',
+    connectionFailure: '',
     timeout: 'info',
-    quota_exceeded: 'success'
+    quotaExceeded: 'success'
   }
   return (map[type] || 'info') as '' | 'success' | 'warning' | 'danger' | 'info'
 }
@@ -489,8 +485,15 @@ onMounted(() => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .fallback-header {
@@ -560,14 +563,43 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.stat-card-rose .stat-icon { background: var(--agw-rose-dim); color: #fb7185; }
-.stat-card-emerald .stat-icon { background: var(--agw-cyan-dim); color: #34d399; }
-.stat-card-amber .stat-icon { background: var(--agw-amber-dim); color: #fbbf24; }
-.stat-card-blue .stat-icon { background: var(--agw-sky-dim); color: #60a5fa; }
+.stat-card-rose .stat-icon {
+  background: var(--agw-rose-dim);
+  color: #fb7185;
+}
 
-.stat-content { flex: 1; min-width: 0; }
-.stat-value { font-size: 22px; font-weight: 700; color: var(--agw-text-primary); line-height: 1.2; }
-.stat-label { font-size: 12px; color: var(--agw-text-secondary); margin-top: 4px; }
+.stat-card-emerald .stat-icon {
+  background: var(--agw-cyan-dim);
+  color: #34d399;
+}
+
+.stat-card-amber .stat-icon {
+  background: var(--agw-amber-dim);
+  color: #fbbf24;
+}
+
+.stat-card-blue .stat-icon {
+  background: var(--agw-sky-dim);
+  color: #60a5fa;
+}
+
+.stat-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--agw-text-primary);
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--agw-text-secondary);
+  margin-top: 4px;
+}
 
 .stat-glow {
   position: absolute;
@@ -580,10 +612,21 @@ onMounted(() => {
   pointer-events: none;
 }
 
-.stat-card-rose .stat-glow { background: #f43f5e; }
-.stat-card-emerald .stat-glow { background: #10b981; }
-.stat-card-amber .stat-glow { background: #f59e0b; }
-.stat-card-blue .stat-glow { background: #3b82f6; }
+.stat-card-rose .stat-glow {
+  background: #f43f5e;
+}
+
+.stat-card-emerald .stat-glow {
+  background: #10b981;
+}
+
+.stat-card-amber .stat-glow {
+  background: #f59e0b;
+}
+
+.stat-card-blue .stat-glow {
+  background: #3b82f6;
+}
 
 /* ── Content Row ── */
 .content-row {
@@ -727,24 +770,55 @@ onMounted(() => {
   gap: 2px;
 }
 
-.provider-name { font-weight: 500; color: var(--agw-text-primary); }
-.provider-id { font-size: 11px; color: var(--agw-text-muted); }
-.plan-name { font-weight: 500; color: var(--agw-text-primary); }
+.provider-name {
+  font-weight: 500;
+  color: var(--agw-text-primary);
+}
+
+.provider-id {
+  font-size: 11px;
+  color: var(--agw-text-muted);
+}
+
+.plan-name {
+  font-weight: 500;
+  color: var(--agw-text-primary);
+}
 
 .rate-tag {
   font-family: var(--agw-font-mono, monospace);
   font-weight: 600;
 }
 
-.latency-value { font-size: 12px; color: var(--agw-text-secondary); }
-.latency-value.latency-high { color: #f43f5e; }
+.latency-value {
+  font-size: 12px;
+  color: var(--agw-text-secondary);
+}
 
-.time-value { font-size: 12px; color: var(--agw-text-secondary); }
+.latency-value.latency-high {
+  color: #f43f5e;
+}
 
-.text-rose { color: #fb7185; }
-.text-amber { color: #fbbf24; }
-.text-emerald { color: #34d399; }
-.text-muted { color: var(--agw-text-muted); }
+.time-value {
+  font-size: 12px;
+  color: var(--agw-text-secondary);
+}
+
+.text-rose {
+  color: #fb7185;
+}
+
+.text-amber {
+  color: #fbbf24;
+}
+
+.text-emerald {
+  color: #34d399;
+}
+
+.text-muted {
+  color: var(--agw-text-muted);
+}
 
 .error-msg {
   font-size: 12px;

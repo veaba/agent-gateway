@@ -6,11 +6,12 @@
     <div class="plan-card-main" @click="toggleExpand">
       <div class="plan-header">
         <div class="plan-provider">
-          <el-tag size="small" :type="getProviderType(plan.provider_id)" effect="dark" round>
-            {{ getProviderName(plan.provider_id) }}
+          <el-tag size="small" :type="getProviderType(plan.providerId)" effect="dark" round>
+            {{ getProviderName(plan.providerId) || 's' }}
           </el-tag>
           <span class="plan-name">{{ plan.name }}</span>
-          <el-tag v-if="getPlanTier()" size="small" :type="getTierType(getPlanTier())" effect="plain" round class="tier-tag">
+          <el-tag v-if="getPlanTier()" size="small" :type="getTierType(getPlanTier())" effect="plain" round
+            class="tier-tag">
             {{ getPlanTier() }}
           </el-tag>
         </div>
@@ -26,21 +27,25 @@
         <div class="plan-info">
           <div class="info-item">
             <span class="label">
-              <el-icon><Monitor /></el-icon>
+              <el-icon>
+                <Monitor />
+              </el-icon>
               模型
             </span>
-            <span class="value model-value">{{ plan.selected_model_id }}</span>
+            <span class="value model-value">{{ plan.selectedModelId }}</span>
           </div>
           <div class="info-item">
             <span class="label">
-              <el-icon><Platform  /></el-icon>
+              <el-icon>
+                <Platform />
+              </el-icon>
               Agent
             </span>
             <div class="agent-tags">
-              <el-tag v-for="agent in plan.bound_agents" :key="agent.agent_id" size="small" effect="plain" round>
-                {{ agent.agent_id }}
+              <el-tag v-for="agent in plan.boundAgents" :key="agent.agentId" size="small" effect="plain" round>
+                {{ agent.agentId }}
               </el-tag>
-              <span v-if="!plan.bound_agents?.length" class="muted">未绑定</span>
+              <span v-if="!plan.boundAgents?.length" class="muted">未绑定</span>
             </div>
           </div>
         </div>
@@ -48,26 +53,24 @@
         <div class="quota-section">
           <div class="quota-header">
             <span class="quota-label">
-              <el-icon><DataLine /></el-icon>
+              <el-icon>
+                <DataLine />
+              </el-icon>
               日配额使用
             </span>
             <span class="quota-value">{{ quotaUsed }} / {{ quotaLimit }}</span>
           </div>
-          <el-progress
-            :percentage="quotaPercent"
-            :stroke-width="8"
-            :color="getQuotaColor(quotaPercent)"
-            :show-text="false"
-          />
+          <el-progress :percentage="quotaPercent" :stroke-width="8" :color="getQuotaColor(quotaPercent)"
+            :show-text="false" />
         </div>
 
         <div class="health-status">
-          <div class="status-indicator" :class="'status-' + plan.health_status"></div>
-          <el-tag :type="getHealthType(plan.health_status)" size="small" effect="dark" round>
-            {{ getHealthLabel(plan.health_status) }}
+          <div class="status-indicator" :class="'status-' + plan.healthStatus"></div>
+          <el-tag :type="getHealthType(plan.healthStatus)" size="small" effect="dark" round>
+            {{ getHealthLabel(plan.healthStatus) }}
           </el-tag>
-          <span v-if="plan.last_health_check" class="last-check">
-            {{ formatTime(plan.last_health_check) }}
+          <span v-if="plan.lastHealthCheck" class="last-check">
+            {{ formatTime(plan.lastHealthCheck) }}
           </span>
         </div>
       </div>
@@ -79,7 +82,9 @@
         <div class="detail-toolbar">
           <span class="detail-title">{{ plan.name }} 详情</span>
           <el-button text size="small" @click="expanded = false">
-            <el-icon><ArrowUp /></el-icon>
+            <el-icon>
+              <ArrowUp />
+            </el-icon>
             收起
           </el-button>
         </div>
@@ -87,38 +92,46 @@
         <!-- Provider Info Section -->
         <div class="detail-section">
           <div class="section-header">
-            <el-icon><OfficeBuilding /></el-icon>
+            <el-icon>
+              <OfficeBuilding />
+            </el-icon>
             <span>Provider 信息</span>
           </div>
           <div class="section-body">
             <div class="detail-row">
               <span class="detail-label">名称</span>
-              <span class="detail-value">{{ providerInfo.name || plan.provider_id }}</span>
+              <span class="detail-value">{{ providerInfo.name || plan.providerId }}</span>
             </div>
             <div v-if="providerInfo.homepage" class="detail-row">
               <span class="detail-label">官网</span>
               <a class="detail-link" :href="providerInfo.homepage" target="_blank">
                 {{ providerInfo.homepage }}
-                <el-icon size="12"><Link /></el-icon>
+                <el-icon size="12">
+                  <Link />
+                </el-icon>
               </a>
             </div>
-            <div v-if="providerInfo.docs_url" class="detail-row">
+            <div v-if="providerInfo.docsUrl" class="detail-row">
               <span class="detail-label">文档</span>
-              <a class="detail-link" :href="providerInfo.docs_url" target="_blank">
-                {{ providerInfo.docs_url }}
-                <el-icon size="12"><Link /></el-icon>
+              <a class="detail-link" :href="providerInfo.docsUrl" target="_blank">
+                {{ providerInfo.docsUrl }}
+                <el-icon size="12">
+                  <Link />
+                </el-icon>
               </a>
             </div>
-            <div v-if="providerInfo.get_api_key_url" class="detail-row">
+            <div v-if="providerInfo.getApiKeyUrl" class="detail-row">
               <span class="detail-label">API Key</span>
-              <a class="detail-link" :href="providerInfo.get_api_key_url" target="_blank">
+              <a class="detail-link" :href="providerInfo.getApiKeyUrl" target="_blank">
                 获取 API Key
-                <el-icon size="12"><Link /></el-icon>
+                <el-icon size="12">
+                  <Link />
+                </el-icon>
               </a>
             </div>
             <div class="detail-row">
               <span class="detail-label">API 格式</span>
-              <el-tag size="small" effect="plain" round>{{ providerInfo.api_format || plan.provider_id }}</el-tag>
+              <el-tag size="small" effect="plain" round>{{ providerInfo.apiFormat || plan.providerId }}</el-tag>
             </div>
           </div>
         </div>
@@ -126,13 +139,15 @@
         <!-- Coding Plan Info Section -->
         <div class="detail-section">
           <div class="section-header">
-            <el-icon><Tickets /></el-icon>
+            <el-icon>
+              <Tickets />
+            </el-icon>
             <span>Coding Plan 信息</span>
           </div>
           <div class="section-body">
             <div class="detail-row">
               <span class="detail-label">方案</span>
-              <span class="detail-value">{{ currentPlanTemplate?.name || plan.plan_id }}</span>
+              <span class="detail-value">{{ currentPlanTemplate?.name || plan.planId }}</span>
             </div>
             <div v-if="currentPlanTemplate" class="detail-row">
               <span class="detail-label">等级</span>
@@ -151,7 +166,8 @@
             <div v-if="currentPlanTemplate?.features?.length" class="detail-row">
               <span class="detail-label">特性</span>
               <div class="feature-tags">
-                <el-tag v-for="f in currentPlanTemplate.features" :key="f" size="small" effect="plain" round type="info">
+                <el-tag v-for="f in currentPlanTemplate.features" :key="f" size="small" effect="plain" round
+                  type="info">
                   {{ f }}
                 </el-tag>
               </div>
@@ -162,26 +178,22 @@
         <!-- Model Config Section -->
         <div class="detail-section">
           <div class="section-header">
-            <el-icon><Cpu /></el-icon>
+            <el-icon>
+              <Cpu />
+            </el-icon>
             <span>模型配置</span>
           </div>
           <div class="section-body">
             <div class="detail-row">
               <span class="detail-label">当前</span>
-              <el-tag size="default" effect="dark" round type="primary">{{ plan.selected_model_id }}</el-tag>
+              <el-tag size="default" effect="dark" round type="primary">{{ plan.selectedModelId }}</el-tag>
             </div>
             <div v-if="availableModels.length" class="detail-row">
               <span class="detail-label">可选</span>
               <div class="model-chips">
-                <el-tag
-                  v-for="m in availableModels"
-                  :key="m.model_id"
-                  size="small"
-                  :type="m.model_id === plan.selected_model_id ? 'primary' : 'info'"
-                  :effect="m.model_id === plan.selected_model_id ? 'dark' : 'plain'"
-                  round
-                  class="model-chip"
-                >
+                <el-tag v-for="m in availableModels" :key="m.modelId" size="small"
+                  :type="m.modelId === plan.selectedModelId ? 'primary' : 'info'"
+                  :effect="m.modelId === plan.selectedModelId ? 'dark' : 'plain'" round class="model-chip">
                   {{ m.name }}
                 </el-tag>
               </div>
@@ -189,21 +201,15 @@
             <div v-if="currentModelInfo" class="detail-row">
               <span class="detail-label">能力</span>
               <div class="capability-tags">
-                <el-tag
-                  v-for="cap in currentModelInfo.capabilities"
-                  :key="cap"
-                  size="small"
-                  effect="plain"
-                  round
-                  :type="getCapabilityType(cap)"
-                >
+                <el-tag v-for="cap in currentModelInfo.capabilities" :key="cap" size="small" effect="plain" round
+                  :type="getCapabilityType(cap)">
                   {{ getCapabilityLabel(cap) }}
                 </el-tag>
               </div>
             </div>
-            <div v-if="currentModelInfo?.context_length" class="detail-row">
+            <div v-if="currentModelInfo?.contextLength" class="detail-row">
               <span class="detail-label">上下文</span>
-              <span class="detail-value mono">{{ formatContextLength(currentModelInfo.context_length) }}</span>
+              <span class="detail-value mono">{{ formatContextLength(currentModelInfo.contextLength) }}</span>
             </div>
           </div>
         </div>
@@ -211,43 +217,47 @@
         <!-- Agent Tools Binding Section -->
         <div class="detail-section">
           <div class="section-header">
-            <el-icon><Connection /></el-icon>
+            <el-icon>
+              <Connection />
+            </el-icon>
             <span>Agent 工具绑定</span>
           </div>
           <div class="section-body">
-            <div v-if="!plan.bound_agents.length" class="empty-agents">
+            <div v-if="!plan.boundAgents.length" class="empty-agents">
               <span class="muted">未绑定任何 Agent 工具</span>
             </div>
-            <div v-for="agent in plan.bound_agents" :key="agent.agent_id" class="agent-binding-row">
+            <div v-for="agent in plan.boundAgents" :key="agent.agentId" class="agent-binding-row">
               <div class="agent-binding-header">
-                <span class="agent-name">{{ getAgentName(agent.agent_id) }}</span>
-                <el-tag
-                  size="small"
-                  :type="agent.configured ? 'success' : 'danger'"
-                  effect="dark"
-                  round
-                >
+                <span class="agent-name">{{ getAgentName(agent.agentId) }}</span>
+                <el-tag size="small" :type="agent.configured ? 'success' : 'danger'" effect="dark" round>
                   {{ getAgentStatusLabel(agent) }}
                 </el-tag>
               </div>
               <div class="agent-binding-detail">
-                <div v-if="getAgentSetupGuide(agent.agent_id)" class="agent-env-vars">
-                  <div v-for="ev in getAgentEnvVars(agent.agent_id)" :key="ev.name" class="env-var-row">
+                <div v-if="getAgentSetupGuide(agent.agentId)" class="agent-env-vars">
+                  <div v-for="ev in getAgentEnvVars(agent.agentId)" :key="ev.name" class="env-var-row">
                     <span class="mono env-var-name">{{ ev.name }}</span>
                     <span class="env-var-value">{{ ev.value }}</span>
                   </div>
-                  <div v-if="getAgentConfigPaths(agent.agent_id)" class="config-path">
-                    <el-icon size="12"><Document /></el-icon>
-                    {{ getAgentConfigPaths(agent.agent_id) }}
+                  <div v-if="getAgentConfigPaths(agent.agentId)" class="config-path">
+                    <el-icon size="12">
+                      <Document />
+                    </el-icon>
+                    {{ getAgentConfigPaths(agent.agentId) }}
                   </div>
                 </div>
                 <div class="agent-actions">
-                  <el-button v-if="!agent.configured" size="small" type="primary" @click="$emit('autoConfig', plan.id, agent.agent_id)">
-                    <el-icon><SetUp /></el-icon>
+                  <el-button v-if="!agent.configured" size="small" type="primary"
+                    @click="$emit('autoConfig', plan.id, agent.agentId)">
+                    <el-icon>
+                      <SetUp />
+                    </el-icon>
                     一键配置
                   </el-button>
-                  <el-button size="small" @click="$emit('testAgent', plan.id, agent.agent_id)">
-                    <el-icon><Connection /></el-icon>
+                  <el-button size="small" @click="$emit('testAgent', plan.id, agent.agentId)">
+                    <el-icon>
+                      <Connection />
+                    </el-icon>
                     测试连接
                   </el-button>
                 </div>
@@ -257,16 +267,8 @@
             <div v-if="unboundAgents.length" class="unbound-section">
               <div class="unbound-header">可绑定的 Agent 工具</div>
               <div class="unbound-agents">
-                <el-tag
-                  v-for="ua in unboundAgents"
-                  :key="ua.agent_id"
-                  size="small"
-                  effect="plain"
-                  round
-                  type="info"
-                  class="unbound-tag"
-                  @click="$emit('bindAgent', plan.id, ua.agent_id)"
-                >
+                <el-tag v-for="ua in unboundAgents" :key="ua.agentId" size="small" effect="plain" round type="info"
+                  class="unbound-tag" @click="$emit('bindAgent', plan.id, ua.agentId)">
                   + {{ ua.name }}
                 </el-tag>
               </div>
@@ -277,27 +279,34 @@
         <!-- API Key Section -->
         <div class="detail-section">
           <div class="section-header">
-            <el-icon><Key /></el-icon>
+            <el-icon>
+              <Key />
+            </el-icon>
             <span>API Key</span>
           </div>
           <div class="section-body">
             <div class="detail-row">
               <span class="detail-label">状态</span>
-              <el-tag :type="plan.api_key_masked ? 'success' : 'danger'" size="small" effect="dark" round>
-                {{ plan.api_key_masked ? '已配置' : '未配置' }}
+              <el-tag :type="plan.apiKeyMasked ? 'success' : 'danger'" size="small" effect="dark" round>
+                {{ plan.apiKeyMasked ? '已配置' : '未配置' }}
               </el-tag>
             </div>
-            <div v-if="plan.api_key_masked" class="detail-row">
+            <div v-if="plan.apiKeyMasked" class="detail-row">
               <span class="detail-label">Key</span>
-              <span class="detail-value mono api-key-masked">{{ plan.api_key_masked }}</span>
+              <span class="detail-value mono api-key-masked">{{ plan.apiKeyMasked }}</span>
             </div>
             <div class="api-key-actions">
               <el-button size="small" @click="$emit('edit', plan)">
-                <el-icon><Edit /></el-icon>
+                <el-icon>
+                  <Edit />
+                </el-icon>
                 更新 Key
               </el-button>
-              <el-button v-if="providerInfo.get_api_key_url" size="small" type="primary" @click="openUrl(providerInfo.get_api_key_url)">
-                <el-icon><Link /></el-icon>
+              <el-button v-if="providerInfo.getApiKeyUrl" size="small" type="primary"
+                @click="openUrl(providerInfo.getApiKeyUrl)">
+                <el-icon>
+                  <Link />
+                </el-icon>
                 获取 Key
               </el-button>
             </div>
@@ -307,7 +316,9 @@
         <!-- Quota & Limits Section -->
         <div class="detail-section">
           <div class="section-header">
-            <el-icon><Odometer /></el-icon>
+            <el-icon>
+              <Odometer />
+            </el-icon>
             <span>配额与限制</span>
           </div>
           <div class="section-body">
@@ -315,29 +326,24 @@
               <div class="quota-item">
                 <span class="quota-item-label">日配额</span>
                 <span class="quota-item-value">
-                  {{ plan.custom_quota_daily ?? currentPlanTemplate?.quota_daily ?? '无限制' }}
-                  <template v-if="plan.custom_quota_daily || currentPlanTemplate?.quota_daily">
+                  {{ plan.customQuotaDaily ?? currentPlanTemplate?.quotaDaily ?? '无限制' }}
+                  <template v-if="plan.customQuotaDaily || currentPlanTemplate?.quotaDaily">
                     {{ quotaUsed }} 已用
                   </template>
                 </span>
-                <el-progress
-                  v-if="quotaPercent > 0"
-                  :percentage="quotaPercent"
-                  :stroke-width="6"
-                  :color="getQuotaColor(quotaPercent)"
-                  :show-text="false"
-                  class="quota-progress"
-                />
+                <el-progress v-if="quotaPercent > 0" :percentage="quotaPercent" :stroke-width="6"
+                  :color="getQuotaColor(quotaPercent)" :show-text="false" class="quota-progress" />
               </div>
               <div class="quota-item">
                 <span class="quota-item-label">月配额</span>
                 <span class="quota-item-value">
-                  {{ plan.custom_quota_monthly ?? currentPlanTemplate?.quota_monthly ?? '无限制' }}
+                  {{ plan.customQuotaMonthly ?? currentPlanTemplate?.quotaMonthly ?? '无限制' }}
                 </span>
               </div>
               <div class="quota-item">
                 <span class="quota-item-label">RPM 限制</span>
-                <span class="quota-item-value">{{ plan.custom_rpm_limit ?? currentPlanTemplate?.rpm_limit ?? '无限制' }}</span>
+                <span class="quota-item-value">{{ plan.customRpmLimit ?? currentPlanTemplate?.rpmLimit ?? '无限制'
+                  }}</span>
               </div>
               <div class="quota-item">
                 <span class="quota-item-label">Fallback 优先级</span>
@@ -350,19 +356,27 @@
         <!-- Action Buttons -->
         <div class="detail-actions">
           <el-button size="default" @click="$emit('edit', plan)">
-            <el-icon><Edit /></el-icon>
+            <el-icon>
+              <Edit />
+            </el-icon>
             编辑
           </el-button>
           <el-button size="default" type="success" @click="$emit('test', plan)">
-            <el-icon><Connection /></el-icon>
+            <el-icon>
+              <Connection />
+            </el-icon>
             测试连接
           </el-button>
           <el-button v-if="plan.id !== defaultPlanId" size="default" type="warning" @click="$emit('setDefault', plan)">
-            <el-icon><Star /></el-icon>
+            <el-icon>
+              <Star />
+            </el-icon>
             设为默认
           </el-button>
           <el-button size="default" type="danger" @click="$emit('delete', plan)">
-            <el-icon><Delete /></el-icon>
+            <el-icon>
+              <Delete />
+            </el-icon>
             删除
           </el-button>
         </div>
@@ -373,8 +387,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Platform  } from '@element-plus/icons-vue'
+import { Platform } from '@element-plus/icons-vue'
 import type { UserPlan, Provider, CodingPlan, Model } from '@/types'
+import { healthLabels, providerNames, statusLabels } from '@/constants/HealthLabel'
 
 const props = defineProps<{
   plan: UserPlan
@@ -399,42 +414,42 @@ const toggleExpand = () => {
 }
 
 const providerInfo = computed(() => props.provider || {
-  provider_id: props.plan.provider_id,
-  name: getProviderName(props.plan.provider_id),
-  api_format: 'anthropic',
+  providerId: props.plan.providerId,
+  name: getProviderName(props.plan.providerId),
+  apiFormat: 'anthropic',
   homepage: '',
-  docs_url: '',
+  docsUrl: '',
 } as Provider)
 
 const currentPlanTemplate = computed((): CodingPlan | undefined => {
-  if (!props.provider?.coding_plans) return undefined
-  return props.provider.coding_plans.find(cp => cp.plan_id === props.plan.plan_id)
+  if (!props.provider?.codingPlans) return undefined
+  return props.provider.codingPlans.find(cp => cp.planId === props.plan.planId)
 })
 
 const availableModels = computed((): Model[] => {
   if (!props.provider?.models) return []
   const template = currentPlanTemplate.value
   if (!template) return props.provider.models || []
-  return props.provider.models.filter(m => template.supported_model_ids.includes(m.model_id))
+  return props.provider.models.filter(m => template.supportedModelIds.includes(m.modelId))
 })
 
 const currentModelInfo = computed((): Model | undefined => {
-  return availableModels.value.find(m => m.model_id === props.plan.selected_model_id)
+  return availableModels.value.find(m => m.modelId === props.plan.selectedModelId)
 })
 
 const unboundAgents = computed(() => {
-  if (!props.provider?.supported_agents) return []
-  const boundIds = props.plan.bound_agents.map(a => a.agent_id)
-  if (currentPlanTemplate.value?.supported_agent_ids) {
-    return props.provider.supported_agents.filter(
-      a => currentPlanTemplate.value!.supported_agent_ids.includes(a.agent_id) && !boundIds.includes(a.agent_id)
+  if (!props.provider?.supportedAgents) return []
+  const boundIds = props.plan.boundAgents.map(a => a.agentId)
+  if (currentPlanTemplate.value?.supportedAgentIds) {
+    return props.provider.supportedAgents.filter(
+      a => currentPlanTemplate.value!.supportedAgentIds.includes(a.agentId) && !boundIds.includes(a.agentId)
     )
   }
-  return props.provider.supported_agents.filter(a => !boundIds.includes(a.agent_id))
+  return props.provider.supportedAgents.filter(a => !boundIds.includes(a.agentId))
 })
 
-const quotaUsed = computed(() => props.plan.quota_used ?? 0)
-const quotaLimit = computed(() => props.plan.quota_limit ?? (currentPlanTemplate.value?.quota_daily ?? 500))
+const quotaUsed = computed(() => props.plan.quotaUsed ?? 0)
+const quotaLimit = computed(() => props.plan.quotaLimit ?? (currentPlanTemplate.value?.quotaDaily ?? 500))
 const quotaPercent = computed(() => {
   if (!quotaLimit.value) return 0
   return Math.min(100, Math.floor((quotaUsed.value / quotaLimit.value) * 100))
@@ -450,15 +465,7 @@ const getProviderType = (providerId: string) => {
 }
 
 const getProviderName = (providerId: string) => {
-  const names: Record<string, string> = {
-    alaya: 'Alaya',
-    anthropic: 'Anthropic',
-    kimi: 'Kimi',
-    openai: 'OpenAI',
-    opencode: 'OpenCode',
-    kilo: 'Kilo'
-  }
-  return names[providerId] || providerId
+  return providerNames[providerId] || providerId
 }
 
 const getPlanTier = () => currentPlanTemplate.value?.tier || ''
@@ -495,14 +502,7 @@ const getHealthType = (status: string) => {
 }
 
 const getHealthLabel = (status: string) => {
-  const labels: Record<string, string> = {
-    healthy: '正常',
-    warning: '警告',
-    error: '错误',
-    unknown: '未知',
-    disabled: '已禁用'
-  }
-  return labels[status] || status
+  return healthLabels[status] || status
 }
 
 const getQuotaColor = (percent: number) => {
@@ -512,8 +512,8 @@ const getQuotaColor = (percent: number) => {
 }
 
 const getAgentName = (agentId: string) => {
-  if (props.provider?.supported_agents) {
-    const found = props.provider.supported_agents.find(a => a.agent_id === agentId)
+  if (props.provider?.supportedAgents) {
+    const found = props.provider.supportedAgents.find(a => a.agentId === agentId)
     if (found) return found.name
   }
   const names: Record<string, string> = {
@@ -525,32 +525,25 @@ const getAgentName = (agentId: string) => {
   return names[agentId] || agentId
 }
 
-const getAgentStatusLabel = (agent: { configured: boolean; config_status: string }) => {
+const getAgentStatusLabel = (agent: { configured: boolean; configStatus: string }) => {
   if (agent.configured) return '已配置'
-  const statusLabels: Record<string, string> = {
-    not_configured: '未配置',
-    auto_configured: '已自动配置',
-    manually_configured: '已手动配置',
-    config_error: '配置错误',
-    needs_update: '需要更新'
-  }
-  return statusLabels[agent.config_status] || '未配置'
+  return statusLabels[agent.configStatus] || '未配置'
 }
 
 const getAgentSetupGuide = (agentId: string) => {
   if (!props.provider?.onboarding) return null
-  return props.provider.onboarding.agent_setup_guides.find(g => g.agent_id === agentId)
+  return props.provider.onboarding.agentSetupGuides.find(g => g.agentId === agentId)
 }
 
 const getAgentEnvVars = (agentId: string) => {
   const guide = getAgentSetupGuide(agentId)
-  return guide?.env_vars || []
+  return guide?.envVars || []
 }
 
 const getAgentConfigPaths = (agentId: string) => {
   const guide = getAgentSetupGuide(agentId)
-  if (!guide?.config_file_paths) return ''
-  const paths = guide.config_file_paths
+  if (!guide?.configFilePaths) return ''
+  const paths = guide.configFilePaths
   return paths.linux || paths.macos || paths.windows || ''
 }
 
@@ -762,15 +755,36 @@ const openUrl = (url: string) => {
   animation: pulse 2s infinite;
 }
 
-.status-healthy { background: #67c23a; }
-.status-warning { background: #e6a23c; }
-.status-error { background: #f56c6c; }
-.status-unknown { background: #909399; }
-.status-disabled { background: #c0c4cc; }
+.status-healthy {
+  background: #67c23a;
+}
+
+.status-warning {
+  background: #e6a23c;
+}
+
+.status-error {
+  background: #f56c6c;
+}
+
+.status-unknown {
+  background: #909399;
+}
+
+.status-disabled {
+  background: #c0c4cc;
+}
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .last-check {
@@ -799,7 +813,7 @@ const openUrl = (url: string) => {
   align-items: center;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--el-border-color-subtle, rgba(255,255,255,0.04));
+  border-bottom: 1px solid var(--el-border-color-subtle, rgba(255, 255, 255, 0.04));
 }
 
 .detail-title {
@@ -1068,6 +1082,7 @@ const openUrl = (url: string) => {
     max-height: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     max-height: 2000px;

@@ -6,80 +6,61 @@
         <p class="section-desc">查看最近的 API 请求记录</p>
       </div>
       <div class="header-actions">
-        <el-input
-          v-model="searchKeyword"
-          placeholder="搜索套餐或模型..."
-          clearable
-          class="search-input"
-        >
+        <el-input v-model="searchKeyword" placeholder="搜索套餐或模型..." clearable class="search-input">
           <template #prefix>
-            <el-icon><Search /></el-icon>
+            <el-icon>
+              <Search />
+            </el-icon>
           </template>
         </el-input>
-        <el-button @click="loadLogs">
-          <el-icon><Refresh /></el-icon>
+        <el-button @click="() => loadLogs()">
+          <el-icon>
+            <Refresh />
+          </el-icon>
           刷新
         </el-button>
       </div>
     </div>
 
     <div class="logs-content">
-      <el-table
-        :data="filteredLogs"
-        class="logs-table"
-        :row-class-name="getRowClass"
-        v-loading="loading"
-        stripe
-      >
+      <el-table :data="filteredLogs" class="logs-table" :row-class-name="getRowClass" v-loading="loading" stripe>
         <el-table-column prop="timestamp" label="时间" width="160">
           <template #default="{ row }">
             <span class="time-value agw-mono">{{ formatTimestamp(row.timestamp) }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="plan_id" label="套餐" min-width="120">
+        <el-table-column prop="planId" label="套餐" min-width="120">
           <template #default="{ row }">
-            <span class="plan-name">{{ getPlanName(row.plan_id) }}</span>
+            <span class="plan-name">{{ getPlanName(row.planId) }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="agent_id" label="Agent" width="110">
+        <el-table-column prop="agentId" label="Agent" width="110">
           <template #default="{ row }">
-            <span class="agent-badge">{{ row.agent_id || '—' }}</span>
+            <span class="agent-badge">{{ row.agentId || '—' }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="model_id" label="模型" min-width="120">
+        <el-table-column prop="modelId" label="模型" min-width="120">
           <template #default="{ row }">
-            <span class="model-badge agw-mono">{{ row.model_id }}</span>
+            <span class="model-badge agw-mono">{{ row.modelId || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column label="状态" width="90" align="center">
           <template #default="{ row }">
-            <el-tag
-              :type="getStatusType(row.status_code)"
-              size="small"
-              round
-              class="status-tag"
-            >
-              {{ row.status_code || '—' }}
+            <el-tag :type="getStatusType(row.statusCode)" size="small" round class="status-tag">
+              {{ row.statusCode || '—' }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column label="延迟" width="100" align="right">
           <template #default="{ row }">
-            <span
-              class="latency-value agw-mono"
-              :class="getLatencyClass(row.latency_ms)"
-            >
-              {{ row.latency_ms ? `${row.latency_ms}ms` : '—' }}
+            <span class="latency-value agw-mono" :class="getLatencyClass(row.latencyMs)">
+              {{ row.latencyMs ? `${row.latencyMs}ms` : '—' }}
             </span>
           </template>
         </el-table-column>
         <el-table-column prop="level" label="级别" width="80" align="center">
           <template #default="{ row }">
-            <el-tag
-              :type="getLevelType(row.level)"
-              size="small"
-              effect="plain"
-            >
+            <el-tag :type="getLevelType(row.level)" size="small" effect="plain">
               {{ row.level || 'INFO' }}
             </el-tag>
           </template>
@@ -95,7 +76,9 @@
             更多
           </el-button>
           <el-button size="small" @click="loadLogs">
-            <el-icon><Refresh /></el-icon>
+            <el-icon>
+              <Refresh />
+            </el-icon>
             刷新
           </el-button>
         </el-button-group>
@@ -120,9 +103,9 @@ const filteredLogs = computed(() => {
   if (!searchKeyword.value) return logs.value
   const keyword = searchKeyword.value.toLowerCase()
   return logs.value.filter(log =>
-    log.plan_id.toLowerCase().includes(keyword) ||
-    log.model_id.toLowerCase().includes(keyword) ||
-    log.agent_id?.toLowerCase().includes(keyword)
+    log.planId.toLowerCase().includes(keyword) ||
+    log.modelId.toLowerCase().includes(keyword) ||
+    log.agentId?.toLowerCase().includes(keyword)
   )
 })
 
@@ -182,8 +165,8 @@ const formatTimestamp = (timestamp: string) => {
 }
 
 const getRowClass = ({ row }: { row: RequestLog }) => {
-  if (!row.status_code) return ''
-  if (row.status_code >= 200 && row.status_code < 400) return 'success-row'
+  if (!row.statusCode) return ''
+  if (row.statusCode >= 200 && row.statusCode < 400) return 'success-row'
   return 'error-row'
 }
 
@@ -198,8 +181,15 @@ onMounted(() => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .logs-header {
@@ -309,9 +299,17 @@ onMounted(() => {
   color: var(--agw-text-secondary);
 }
 
-.latency-medium { color: #f59e0b; }
-.latency-high { color: #f97316; }
-.latency-critical { color: #f43f5e; }
+.latency-medium {
+  color: #f59e0b;
+}
+
+.latency-high {
+  color: #f97316;
+}
+
+.latency-critical {
+  color: #f43f5e;
+}
 
 .logs-footer {
   display: flex;

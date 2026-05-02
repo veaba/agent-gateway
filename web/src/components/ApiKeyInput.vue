@@ -1,21 +1,18 @@
 <template>
   <div class="api-key-input">
-    <el-input
-      :model-value="modelValue"
-      type="password"
-      show-password
-      placeholder="粘贴您的 API Key"
-      @update:model-value="handleInput"
-    >
+    <el-input :model-value="modelValue" type="password" show-password placeholder="粘贴您的 API Key"
+      @update:model-value="handleInput">
       <template #prepend>
         <el-button @click="handleOpenPage">
-          <el-icon><Link /></el-icon>
+          <el-icon>
+            <Link />
+          </el-icon>
           去获取 API Key
         </el-button>
       </template>
     </el-input>
 
-    <el-button v-if="provider.setup_guide_url" @click="handleOpenGuide">
+    <el-button v-if="provider.setupGuideUrl" @click="handleOpenGuide">
       查看配置指南
     </el-button>
 
@@ -28,12 +25,7 @@
     </div>
 
     <div class="test-section">
-      <el-button
-        type="success"
-        :loading="testing"
-        :disabled="!modelValue"
-        @click="handleTest"
-      >
+      <el-button type="success" :loading="testing" :disabled="!modelValue" @click="handleTest">
         测试连接
       </el-button>
       <div v-if="testResult" class="test-result">
@@ -75,8 +67,8 @@ const handleOpenPage = () => {
 }
 
 const handleOpenGuide = () => {
-  if (props.provider.setup_guide_url) {
-    window.open(props.provider.setup_guide_url, '_blank')
+  if (props.provider.setupGuideUrl) {
+    window.open(props.provider.setupGuideUrl, '_blank')
   }
 }
 
@@ -91,8 +83,8 @@ const ignoreClipboard = () => {
 
 const checkClipboard = async () => {
   try {
-    const detected = await invoke<string | null>('check_clipboard_for_key', {
-      expectedPrefix: getExpectedPrefix(props.provider.provider_id)
+    const detected = await invoke<string | null>('checkClipboardForKey', {
+      expectedPrefix: getExpectedPrefix(props.provider.providerId)
     })
     if (detected) {
       clipboardDetected.value = true

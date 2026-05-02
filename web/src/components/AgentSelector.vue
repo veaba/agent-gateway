@@ -1,22 +1,16 @@
 <template>
   <div class="agent-selector">
-    <div
-      v-for="agent in agents"
-      :key="agent.agent_id"
-      class="agent-item"
-      :class="{ selected: isSelected(agent.agent_id) }"
-      @click="handleToggle(agent.agent_id)"
-    >
-      <el-checkbox
-        :model-value="isSelected(agent.agent_id)"
-        size="large"
-      />
+    <div v-for="agent in agents" :key="agent.agentId" class="agent-item"
+      :class="{ selected: isSelected(agent.agentId) }" @click="handleToggle(agent.agentId)">
+      <el-checkbox :model-value="isSelected(agent.agentId)" size="large" />
       <div class="agent-icon">
-        <el-icon :size="24"><Robot /></el-icon>
+        <el-icon :size="24">
+          <Robot />
+        </el-icon>
       </div>
       <div class="agent-info">
         <div class="agent-name">{{ agent.name }}</div>
-        <div class="agent-id">{{ agent.agent_id }}</div>
+        <div class="agent-id">{{ agent.agentId }}</div>
       </div>
     </div>
   </div>

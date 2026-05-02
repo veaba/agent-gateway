@@ -2,41 +2,41 @@
 
 // Enums
 export enum ApiFormat {
-  Anthropic = 'Anthropic',
-  OpenAi = 'OpenAi',
-  Custom = 'Custom',
+  Anthropic = "Anthropic",
+  OpenAi = "OpenAi",
+  Custom = "Custom",
 }
 
 export enum PlanTier {
-  Free = 'Free',
-  Pro = 'Pro',
-  Enterprise = 'Enterprise',
-  Custom = 'Custom',
+  Free = "Free",
+  Pro = "Pro",
+  Enterprise = "Enterprise",
+  Custom = "Custom",
 }
 
 export enum ModelCapability {
-  Code = 'Code',
-  Reasoning = 'Reasoning',
-  LongContext = 'LongContext',
-  ChineseOptimized = 'ChineseOptimized',
-  Math = 'Math',
-  Multimodal = 'Multimodal',
+  Code = "Code",
+  Reasoning = "Reasoning",
+  LongContext = "LongContext",
+  ChineseOptimized = "ChineseOptimized",
+  Math = "Math",
+  Multimodal = "Multimodal",
 }
 
 export enum AgentConfigStatus {
-  NotConfigured = 'NotConfigured',
-  AutoConfigured = 'AutoConfigured',
-  ManuallyConfigured = 'ManuallyConfigured',
-  ConfigError = 'ConfigError',
-  NeedsUpdate = 'NeedsUpdate',
+  NotConfigured = "NotConfigured",
+  AutoConfigured = "AutoConfigured",
+  ManuallyConfigured = "ManuallyConfigured",
+  ConfigError = "ConfigError",
+  NeedsUpdate = "NeedsUpdate",
 }
 
 export enum HealthStatus {
-  Unknown = 'Unknown',
-  Healthy = 'Healthy',
-  Warning = 'Warning',
-  Error = 'Error',
-  Disabled = 'Disabled',
+  Unknown = "Unknown",
+  Healthy = "Healthy",
+  Warning = "Warning",
+  Error = "Error",
+  Disabled = "Disabled",
 }
 
 // Interfaces
@@ -81,7 +81,7 @@ export interface PlatformPaths {
 }
 
 export interface ProviderInfo {
-  provider_id: string;
+  providerId: string;
   name: string;
   description: string;
   logo_url?: string;
@@ -120,7 +120,7 @@ export interface ModelInfo {
   description?: string;
   context_length?: number;
   capabilities: ModelCapability[];
-  provider_id: string;
+  providerId: string;
 }
 
 export interface AgentRefInfo {
@@ -130,7 +130,7 @@ export interface AgentRefInfo {
 
 export interface PlanInfo {
   id: string;
-  provider_id: string;
+  providerId: string;
   plan_id: string;
   name: string;
   api_key_masked: string;
@@ -188,7 +188,7 @@ export interface HealthResponse {
 
 // Input types
 export interface CreatePlanInput {
-  provider_id: string;
+  providerId: string;
   plan_id: string;
   name: string;
   api_key: string;

@@ -1,7 +1,7 @@
 // API 类型定义
 
 export interface Provider {
-  provider_id: string
+  providerId: string
   name: string
   description: string
   logo_url?: string
@@ -39,7 +39,7 @@ export interface Model {
   description?: string
   context_length?: number
   capabilities: string[]
-  provider_id: string
+  providerId: string
 }
 
 export interface AgentRef {
@@ -54,8 +54,8 @@ export interface PlanQuota {
 
 export interface UserPlan {
   id: string
-  provider_id: string
-  plan_id: string
+  providerId: string
+  planId: string
   name: string
   api_key_masked?: string  // From backend (masked)
   selected_model_id: string

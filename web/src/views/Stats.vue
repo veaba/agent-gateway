@@ -5,7 +5,9 @@
       <el-col :xs="24" :sm="12" :lg="8" :xl="6">
         <div class="stat-card stat-card-blue">
           <div class="stat-icon">
-            <el-icon :size="28"><TrendCharts /></el-icon>
+            <el-icon :size="28">
+              <TrendCharts />
+            </el-icon>
           </div>
           <div class="stat-content">
             <div class="stat-value agw-mono">{{ formatNumber(globalStats.totalRequests) }}</div>
@@ -17,18 +19,16 @@
       <el-col :xs="24" :sm="12" :lg="8" :xl="6">
         <div class="stat-card stat-card-emerald">
           <div class="stat-icon">
-            <el-icon :size="28"><CircleCheck /></el-icon>
+            <el-icon :size="28">
+              <CircleCheck />
+            </el-icon>
           </div>
           <div class="stat-content">
             <div class="stat-value agw-mono">{{ formatPercent(globalStats.successRate) }}</div>
             <div class="stat-label">成功率</div>
-            <el-progress
-              :percentage="Math.round(globalStats.successRate * 100)"
-              :stroke-width="4"
-              :show-text="false"
+            <el-progress :percentage="Math.round(globalStats.successRate * 100)" :stroke-width="4" :show-text="false"
               class="stat-progress"
-              :color="globalStats.successRate >= 0.95 ? '#10b981' : globalStats.successRate >= 0.9 ? '#f59e0b' : '#f43f5e'"
-            />
+              :color="globalStats.successRate >= 0.95 ? '#10b981' : globalStats.successRate >= 0.9 ? '#f59e0b' : '#f43f5e'" />
           </div>
           <div class="stat-glow"></div>
         </div>
@@ -36,10 +36,13 @@
       <el-col :xs="24" :sm="12" :lg="8" :xl="6">
         <div class="stat-card stat-card-amber">
           <div class="stat-icon">
-            <el-icon :size="28"><Timer /></el-icon>
+            <el-icon :size="28">
+              <Timer />
+            </el-icon>
           </div>
           <div class="stat-content">
-            <div class="stat-value agw-mono">{{ Math.round(globalStats.avgLatencyMs) }}<span class="stat-unit">ms</span></div>
+            <div class="stat-value agw-mono">{{ Math.round(globalStats.avgLatencyMs) }}<span class="stat-unit">ms</span>
+            </div>
             <div class="stat-label">平均延迟</div>
           </div>
           <div class="stat-glow"></div>
@@ -48,7 +51,9 @@
       <el-col :xs="24" :sm="12" :lg="8" :xl="6">
         <div class="stat-card stat-card-rose">
           <div class="stat-icon">
-            <el-icon :size="28"><Warning /></el-icon>
+            <el-icon :size="28">
+              <Warning />
+            </el-icon>
           </div>
           <div class="stat-content">
             <div class="stat-value agw-mono">{{ formatNumber(globalStats.totalErrors) }}</div>
@@ -60,7 +65,9 @@
       <el-col :xs="24" :sm="12" :lg="8" :xl="6">
         <div class="stat-card stat-card-purple">
           <div class="stat-icon">
-            <el-icon :size="28"><Connection /></el-icon>
+            <el-icon :size="28">
+              <Connection />
+            </el-icon>
           </div>
           <div class="stat-content">
             <div class="stat-value agw-mono">{{ globalStats.plansCount }}</div>
@@ -72,7 +79,9 @@
       <el-col :xs="24" :sm="12" :lg="8" :xl="6">
         <div class="stat-card stat-card-sky">
           <div class="stat-icon">
-            <el-icon :size="28"><Box /></el-icon>
+            <el-icon :size="28">
+              <Box />
+            </el-icon>
           </div>
           <div class="stat-content">
             <div class="stat-value agw-mono">{{ globalStats.providersCount }}</div>
@@ -84,7 +93,9 @@
       <el-col :xs="24" :sm="12" :lg="8" :xl="6">
         <div class="stat-card stat-card-cyan">
           <div class="stat-icon">
-            <el-icon :size="28"><User /></el-icon>
+            <el-icon :size="28">
+              <User />
+            </el-icon>
           </div>
           <div class="stat-content">
             <div class="stat-value agw-mono">{{ globalStats.activeAgents }}</div>
@@ -96,10 +107,13 @@
       <el-col :xs="24" :sm="12" :lg="8" :xl="6">
         <div class="stat-card stat-card-indigo">
           <div class="stat-icon">
-            <el-icon :size="28"><DataLine /></el-icon>
+            <el-icon :size="28">
+              <DataLine />
+            </el-icon>
           </div>
           <div class="stat-content">
-            <div class="stat-value agw-mono">{{ formatNumber(globalStats.totalInputTokens + globalStats.totalOutputTokens) }}</div>
+            <div class="stat-value agw-mono">{{ formatNumber(globalStats.totalInputTokens +
+              globalStats.totalOutputTokens) }}</div>
             <div class="stat-label">总 Token 数</div>
           </div>
           <div class="stat-glow"></div>
@@ -114,7 +128,9 @@
           <div class="card-header">
             <span class="card-title">Fallback 降级统计</span>
             <el-button text size="small" @click="loadFallbackData">
-              <el-icon><Refresh /></el-icon>
+              <el-icon>
+                <Refresh />
+              </el-icon>
               刷新
             </el-button>
           </div>
@@ -147,16 +163,13 @@
                     <span class="trigger-label">{{ formatTriggerType(item.triggerType) }}</span>
                     <span class="trigger-count agw-mono">{{ item.count }}</span>
                   </div>
-                  <el-progress
-                    :percentage="Math.round((item.count / Math.max(fallbackStats.totalEvents, 1)) * 100)"
-                    :stroke-width="6"
-                    :show-text="false"
-                    :color="getTriggerColor(item.triggerType)"
-                  />
+                  <el-progress :percentage="Math.round((item.count / Math.max(fallbackStats.totalEvents, 1)) * 100)"
+                    :stroke-width="6" :show-text="false" :color="getTriggerColor(item.triggerType)" />
                 </div>
               </div>
             </div>
-            <el-empty v-else-if="fallbackStats.totalEvents === 0 && !loading.fallback" description="暂无降级事件" :image-size="60" />
+            <el-empty v-else-if="fallbackStats.totalEvents === 0 && !loading.fallback" description="暂无降级事件"
+              :image-size="60" />
           </div>
         </div>
       </el-col>
@@ -166,16 +179,13 @@
           <div class="card-header">
             <span class="card-title">Provider 性能指标</span>
             <el-button text size="small" @click="loadFallbackData">
-              <el-icon><Refresh /></el-icon>
+              <el-icon>
+                <Refresh />
+              </el-icon>
               刷新
             </el-button>
           </div>
-          <el-table
-            :data="providerPerformance"
-            class="stats-table"
-            v-loading="loading.fallback"
-            stripe
-          >
+          <el-table :data="providerPerformance" class="stats-table" v-loading="loading.fallback" stripe>
             <el-table-column label="Provider" min-width="140">
               <template #default="{ row }">
                 <div class="provider-cell">
@@ -186,31 +196,24 @@
             </el-table-column>
             <el-table-column label="健康分" width="90" align="center">
               <template #default="{ row }">
-                <el-tag
-                  :type="row.healthScore >= 80 ? 'success' : row.healthScore >= 60 ? 'warning' : 'danger'"
-                  size="small"
-                  round
-                  class="rate-tag"
-                >
+                <el-tag :type="row.healthScore >= 80 ? 'success' : row.healthScore >= 60 ? 'warning' : 'danger'"
+                  size="small" round class="rate-tag">
                   {{ Math.round(row.healthScore) }}
                 </el-tag>
               </template>
             </el-table-column>
             <el-table-column label="降级率" width="90" align="center">
               <template #default="{ row }">
-                <span class="agw-mono" :class="{ 'text-rose': row.fallbackRate > 0.1, 'text-amber': row.fallbackRate > 0.05 }">
+                <span class="agw-mono"
+                  :class="{ 'text-rose': row.fallbackRate > 0.1, 'text-amber': row.fallbackRate > 0.05 }">
                   {{ (row.fallbackRate * 100).toFixed(1) }}%
                 </span>
               </template>
             </el-table-column>
             <el-table-column label="成功率" width="90" align="center">
               <template #default="{ row }">
-                <el-tag
-                  :type="row.successRate >= 0.95 ? 'success' : row.successRate >= 0.9 ? 'warning' : 'danger'"
-                  size="small"
-                  round
-                  class="rate-tag"
-                >
+                <el-tag :type="row.successRate >= 0.95 ? 'success' : row.successRate >= 0.9 ? 'warning' : 'danger'"
+                  size="small" round class="rate-tag">
                   {{ (row.successRate * 100).toFixed(1) }}%
                 </el-tag>
               </template>
@@ -236,7 +239,8 @@
               </template>
             </el-table-column>
           </el-table>
-          <el-empty v-if="providerPerformance.length === 0 && !loading.fallback" description="暂无 Provider 性能数据" :image-size="60" />
+          <el-empty v-if="providerPerformance.length === 0 && !loading.fallback" description="暂无 Provider 性能数据"
+            :image-size="60" />
         </div>
       </el-col>
     </el-row>
@@ -249,16 +253,13 @@
           <div class="card-header">
             <span class="card-title">Provider 统计</span>
             <el-button text size="small" @click="loadData">
-              <el-icon><Refresh /></el-icon>
+              <el-icon>
+                <Refresh />
+              </el-icon>
               刷新
             </el-button>
           </div>
-          <el-table
-            :data="providerStats"
-            class="stats-table"
-            v-loading="loading.providers"
-            stripe
-          >
+          <el-table :data="providerStats" class="stats-table" v-loading="loading.providers" stripe>
             <el-table-column label="Provider" min-width="140">
               <template #default="{ row }">
                 <div class="provider-cell">
@@ -279,12 +280,8 @@
             </el-table-column>
             <el-table-column label="成功率" width="110" align="center">
               <template #default="{ row }">
-                <el-tag
-                  :type="row.successRate >= 0.95 ? 'success' : row.successRate >= 0.9 ? 'warning' : 'danger'"
-                  size="small"
-                  round
-                  class="rate-tag"
-                >
+                <el-tag :type="row.successRate >= 0.95 ? 'success' : row.successRate >= 0.9 ? 'warning' : 'danger'"
+                  size="small" round class="rate-tag">
                   {{ formatPercent(row.successRate) }}
                 </el-tag>
               </template>
@@ -297,27 +294,17 @@
               </template>
             </el-table-column>
           </el-table>
-          <el-empty v-if="providerStats.length === 0 && !loading.providers" description="暂无 Provider 数据" :image-size="60" />
+          <el-empty v-if="providerStats.length === 0 && !loading.providers" description="暂无 Provider 数据"
+            :image-size="60" />
         </div>
 
         <!-- Plan Stats Selector -->
         <div class="content-card">
           <div class="card-header">
             <span class="card-title">套餐详细统计</span>
-            <el-select
-              v-model="selectedPlanId"
-              placeholder="选择套餐"
-              size="small"
-              class="plan-select"
-              clearable
-              @change="loadPlanStats"
-            >
-              <el-option
-                v-for="plan in plans"
-                :key="plan.id"
-                :label="plan.name"
-                :value="plan.id"
-              />
+            <el-select v-model="selectedPlanId" placeholder="选择套餐" size="small" class="plan-select" clearable
+              @change="loadPlanStats">
+              <el-option v-for="plan in plans" :key="plan.id" :label="plan.name" :value="plan.id" />
             </el-select>
           </div>
 
@@ -351,45 +338,39 @@
                     <span>日配额</span>
                     <span class="quota-bar-value agw-mono">
                       {{ selectedPlanStats.quotaUsage.dailyUsed }}
-                      <span v-if="selectedPlanStats.quotaUsage.dailyLimit">/ {{ selectedPlanStats.quotaUsage.dailyLimit }}</span>
+                      <span v-if="selectedPlanStats.quotaUsage.dailyLimit">/ {{ selectedPlanStats.quotaUsage.dailyLimit
+                        }}</span>
                     </span>
                   </div>
-                  <el-progress
-                    :percentage="Math.round(selectedPlanStats.quotaUsage.dailyPercent * 100)"
-                    :stroke-width="8"
-                    :color="getQuotaColor(selectedPlanStats.quotaUsage.dailyPercent * 100)"
-                    :show-text="false"
-                  />
+                  <el-progress :percentage="Math.round(selectedPlanStats.quotaUsage.dailyPercent * 100)"
+                    :stroke-width="8" :color="getQuotaColor(selectedPlanStats.quotaUsage.dailyPercent * 100)"
+                    :show-text="false" />
                 </div>
                 <div class="quota-bar-item">
                   <div class="quota-bar-header">
                     <span>月配额</span>
                     <span class="quota-bar-value agw-mono">
                       {{ selectedPlanStats.quotaUsage.monthlyUsed }}
-                      <span v-if="selectedPlanStats.quotaUsage.monthlyLimit">/ {{ selectedPlanStats.quotaUsage.monthlyLimit }}</span>
+                      <span v-if="selectedPlanStats.quotaUsage.monthlyLimit">/ {{
+                        selectedPlanStats.quotaUsage.monthlyLimit
+                        }}</span>
                     </span>
                   </div>
-                  <el-progress
-                    :percentage="Math.round(selectedPlanStats.quotaUsage.monthlyPercent * 100)"
-                    :stroke-width="8"
-                    :color="getQuotaColor(selectedPlanStats.quotaUsage.monthlyPercent * 100)"
-                    :show-text="false"
-                  />
+                  <el-progress :percentage="Math.round(selectedPlanStats.quotaUsage.monthlyPercent * 100)"
+                    :stroke-width="8" :color="getQuotaColor(selectedPlanStats.quotaUsage.monthlyPercent * 100)"
+                    :show-text="false" />
                 </div>
                 <div class="quota-bar-item">
                   <div class="quota-bar-header">
                     <span>RPM</span>
                     <span class="quota-bar-value agw-mono">
                       {{ selectedPlanStats.quotaUsage.rpmUsed }}
-                      <span v-if="selectedPlanStats.quotaUsage.rpmLimit">/ {{ selectedPlanStats.quotaUsage.rpmLimit }}</span>
+                      <span v-if="selectedPlanStats.quotaUsage.rpmLimit">/ {{ selectedPlanStats.quotaUsage.rpmLimit
+                        }}</span>
                     </span>
                   </div>
-                  <el-progress
-                    :percentage="Math.round(selectedPlanStats.quotaUsage.rpmPercent * 100)"
-                    :stroke-width="8"
-                    :color="getQuotaColor(selectedPlanStats.quotaUsage.rpmPercent * 100)"
-                    :show-text="false"
-                  />
+                  <el-progress :percentage="Math.round(selectedPlanStats.quotaUsage.rpmPercent * 100)" :stroke-width="8"
+                    :color="getQuotaColor(selectedPlanStats.quotaUsage.rpmPercent * 100)" :show-text="false" />
                 </div>
               </div>
             </div>
@@ -414,22 +395,12 @@
 
           <div v-loading="loading.trend" class="trend-content">
             <div v-if="usageTrend.points.length > 0" class="trend-chart">
-              <div
-                v-for="(point, idx) in visibleTrendPoints"
-                :key="idx"
-                class="trend-bar-group"
-              >
+              <div v-for="(point, idx) in visibleTrendPoints" :key="idx" class="trend-bar-group">
                 <div class="trend-bar-wrapper">
-                  <div
-                    class="trend-bar trend-bar-requests"
-                    :style="{ height: getBarHeight(point.requests) + '%' }"
-                    :title="`请求: ${point.requests}`"
-                  ></div>
-                  <div
-                    class="trend-bar trend-bar-errors"
-                    :style="{ height: getBarHeight(point.errors) + '%' }"
-                    :title="`错误: ${point.errors}`"
-                  ></div>
+                  <div class="trend-bar trend-bar-requests" :style="{ height: getBarHeight(point.requests) + '%' }"
+                    :title="`请求: ${point.requests}`"></div>
+                  <div class="trend-bar trend-bar-errors" :style="{ height: getBarHeight(point.errors) + '%' }"
+                    :title="`错误: ${point.errors}`"></div>
                 </div>
                 <div class="trend-label">{{ formatTrendTime(point.timestamp) }}</div>
               </div>
@@ -513,22 +484,22 @@ const providerPerformance = ref<ProviderPerformance[]>([])
 // Trigger type formatting
 const formatTriggerType = (type: string) => {
   const map: Record<string, string> = {
-    rate_limit: '速率限制',
-    server_error: '服务端错误',
-    connection_failure: '连接失败',
+    rateLimit: '速率限制',
+    serverError: '服务端错误',
+    connectionFailure: '连接失败',
     timeout: '请求超时',
-    quota_exceeded: '配额耗尽'
+    quotaExceeded: '配额耗尽'
   }
   return map[type] || type
 }
 
 const getTriggerColor = (type: string) => {
   const map: Record<string, string> = {
-    rate_limit: '#f59e0b',
-    server_error: '#f43f5e',
-    connection_failure: '#8b5cf6',
+    rateLimit: '#f59e0b',
+    serverError: '#f43f5e',
+    connectionFailure: '#8b5cf6',
     timeout: '#06b6d4',
-    quota_exceeded: '#10b981'
+    quotaExceeded: '#10b981'
   }
   return map[type] || '#6b7280'
 }
@@ -680,8 +651,15 @@ onMounted(() => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Stats Row ── */
@@ -720,14 +698,45 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.stat-card-blue .stat-icon { background: var(--agw-sky-dim); color: #60a5fa; }
-.stat-card-emerald .stat-icon { background: var(--agw-cyan-dim); color: #34d399; }
-.stat-card-amber .stat-icon { background: var(--agw-amber-dim); color: #fbbf24; }
-.stat-card-rose .stat-icon { background: var(--agw-rose-dim); color: #fb7185; }
-.stat-card-purple .stat-icon { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
-.stat-card-sky .stat-icon { background: var(--agw-sky-dim); color: #22d3ee; }
-.stat-card-cyan .stat-icon { background: var(--agw-cyan-dim); color: #67e8f9; }
-.stat-card-indigo .stat-icon { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
+.stat-card-blue .stat-icon {
+  background: var(--agw-sky-dim);
+  color: #60a5fa;
+}
+
+.stat-card-emerald .stat-icon {
+  background: var(--agw-cyan-dim);
+  color: #34d399;
+}
+
+.stat-card-amber .stat-icon {
+  background: var(--agw-amber-dim);
+  color: #fbbf24;
+}
+
+.stat-card-rose .stat-icon {
+  background: var(--agw-rose-dim);
+  color: #fb7185;
+}
+
+.stat-card-purple .stat-icon {
+  background: rgba(139, 92, 246, 0.2);
+  color: #a78bfa;
+}
+
+.stat-card-sky .stat-icon {
+  background: var(--agw-sky-dim);
+  color: #22d3ee;
+}
+
+.stat-card-cyan .stat-icon {
+  background: var(--agw-cyan-dim);
+  color: #67e8f9;
+}
+
+.stat-card-indigo .stat-icon {
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+}
 
 .stat-content {
   flex: 1;
@@ -769,14 +778,37 @@ onMounted(() => {
   pointer-events: none;
 }
 
-.stat-card-blue .stat-glow { background: #3b82f6; }
-.stat-card-emerald .stat-glow { background: #10b981; }
-.stat-card-amber .stat-glow { background: #f59e0b; }
-.stat-card-rose .stat-glow { background: #f43f5e; }
-.stat-card-purple .stat-glow { background: #8b5cf6; }
-.stat-card-sky .stat-glow { background: #22d3ee; }
-.stat-card-cyan .stat-glow { background: #06b6d4; }
-.stat-card-indigo .stat-glow { background: #6366f1; }
+.stat-card-blue .stat-glow {
+  background: #3b82f6;
+}
+
+.stat-card-emerald .stat-glow {
+  background: #10b981;
+}
+
+.stat-card-amber .stat-glow {
+  background: #f59e0b;
+}
+
+.stat-card-rose .stat-glow {
+  background: #f43f5e;
+}
+
+.stat-card-purple .stat-glow {
+  background: #8b5cf6;
+}
+
+.stat-card-sky .stat-glow {
+  background: #22d3ee;
+}
+
+.stat-card-cyan .stat-glow {
+  background: #06b6d4;
+}
+
+.stat-card-indigo .stat-glow {
+  background: #6366f1;
+}
 
 /* ── Content Row ── */
 .content-row {

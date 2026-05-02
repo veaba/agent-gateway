@@ -148,7 +148,7 @@ function createMockGateway(): IGateway {
     async listProviders(): Promise<ProviderInfo[]> {
       return [
         {
-          provider_id: 'alaya',
+          providerId: 'alaya',
           name: 'Alaya',
           description: 'Alaya AI Coding Platform',
           homepage: 'https://alaya.com',
@@ -182,7 +182,7 @@ function createMockGateway(): IGateway {
 
     async getProvider(providerId: string): Promise<ProviderInfo | null> {
       const providers = await this.listProviders();
-      return providers.find(p => p.provider_id === providerId) || null;
+      return providers.find(p => p.providerId === providerId) || null;
     },
 
     async listPlans(): Promise<PlanInfo[]> {
@@ -195,8 +195,8 @@ function createMockGateway(): IGateway {
 
     async createPlan(input: CreatePlanInput): Promise<PlanInfo> {
       const plan: PlanInfo = {
-        id: `${input.provider_id}-${Date.now()}`,
-        provider_id: input.provider_id,
+        id: `${input.providerId}-${Date.now()}`,
+        providerId: input.providerId,
         plan_id: input.plan_id,
         name: input.name,
         api_key_masked: input.api_key.length > 8

@@ -6,7 +6,9 @@
         <p class="section-desc">管理您的 AI 服务配置</p>
       </div>
       <el-button type="primary" size="large" class="add-btn" @click="$router.push('/plans/add')">
-        <el-icon><Plus /></el-icon>
+        <el-icon>
+          <Plus />
+        </el-icon>
         添加套餐
       </el-button>
     </div>
@@ -19,75 +21,47 @@
     <!-- Empty State -->
     <el-empty v-else-if="plans.length === 0" description="还没有配置任何套餐" class="empty-state">
       <template #image>
-        <el-icon :size="80" class="empty-icon"><Connection /></el-icon>
+        <el-icon :size="80" class="empty-icon">
+          <Connection />
+        </el-icon>
       </template>
       <template #description>
         <p class="empty-desc">添加第一个 AI 套餐开始使用</p>
       </template>
       <el-button type="primary" size="large" @click="$router.push('/plans/add')">
-        <el-icon><Plus /></el-icon>
+        <el-icon>
+          <Plus />
+        </el-icon>
         添加第一个套餐
       </el-button>
     </el-empty>
 
     <!-- Plans Grid -->
     <div v-else class="plans-grid agw-stagger">
-      <PlanCard
-        v-for="plan in plans"
-        :key="plan.id"
-        :plan="plan"
-        :default-plan-id="defaultPlanId"
-        :provider="getProviderForPlan(plan)"
-        @edit="handleEdit"
-        @delete="handleDelete"
-        @test="handleTest"
-        @set-default="handleSetDefault"
-        @bind-agent="handleBindAgent"
-        @auto-config="handleAutoConfig"
-        @test-agent="handleTestAgent"
-      />
+      <PlanCard v-for="plan in plans" :key="plan.id" :plan="plan" :default-plan-id="defaultPlanId"
+        :provider="getProviderForPlan(plan)" @edit="handleEdit" @delete="handleDelete" @test="handleTest"
+        @set-default="handleSetDefault" @bind-agent="handleBindAgent" @auto-config="handleAutoConfig"
+        @test-agent="handleTestAgent" />
     </div>
 
     <!-- Edit Dialog -->
-    <el-dialog
-      v-model="editDialogVisible"
-      title="编辑套餐"
-      width="560px"
-      :close-on-click-modal="false"
-      class="edit-dialog"
-    >
-      <el-form
-        ref="editFormRef"
-        :model="editForm"
-        :rules="editRules"
-        label-position="top"
-        class="edit-form"
-      >
+    <el-dialog v-model="editDialogVisible" title="编辑套餐" width="560px" :close-on-click-modal="false" class="edit-dialog">
+      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-position="top" class="edit-form">
         <el-form-item label="套餐名称" prop="name">
           <el-input v-model="editForm.name" placeholder="给套餐起个名字" clearable />
         </el-form-item>
 
-        <el-form-item label="API Key" prop="api_key">
-          <el-input
-            v-model="editForm.api_key"
-            type="password"
-            show-password
-            placeholder="留空则保持原值，填写则更新"
-          />
+        <el-form-item label="API Key" prop="apiKey">
+          <el-input v-model="editForm.apiKey" type="password" show-password placeholder="留空则保持原值，填写则更新" />
           <div class="form-tip">留空则保持原 API Key 不变</div>
         </el-form-item>
 
-        <el-form-item label="模型" prop="selected_model_id">
-          <el-select v-model="editForm.selected_model_id" placeholder="选择模型" clearable style="width: 100%">
-            <el-option
-              v-for="model in availableModels"
-              :key="model.model_id"
-              :label="model.name"
-              :value="model.model_id"
-            >
+        <el-form-item label="模型" prop="selectedModelId">
+          <el-select v-model="editForm.selectedModelId" placeholder="选择模型" clearable style="width: 100%">
+            <el-option v-for="model in availableModels" :key="model.modelId" :label="model.name" :value="model.modelId">
               <div class="model-option">
                 <span class="model-name">{{ model.name }}</span>
-                <span class="model-id">{{ model.model_id }}</span>
+                <span class="model-id">{{ model.modelId }}</span>
               </div>
             </el-option>
           </el-select>
@@ -101,13 +75,8 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="优先级" prop="priority">
-              <el-input-number
-                v-model="editForm.priority"
-                :min="1"
-                :max="100"
-                controls-position="right"
-                style="width: 100%"
-              />
+              <el-input-number v-model="editForm.priority" :min="1" :max="100" controls-position="right"
+                style="width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -117,46 +86,26 @@
         <el-row :gutter="16">
           <el-col :span="8">
             <el-form-item label="日配额上限">
-              <el-input-number
-                v-model="editForm.custom_quota_daily"
-                :min="0"
-                controls-position="right"
-                style="width: 100%"
-                placeholder="无限制"
-              />
+              <el-input-number v-model="editForm.customQuotaDaily" :min="0" controls-position="right"
+                style="width: 100%" placeholder="无限制" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="月配额上限">
-              <el-input-number
-                v-model="editForm.custom_quota_monthly"
-                :min="0"
-                controls-position="right"
-                style="width: 100%"
-                placeholder="无限制"
-              />
+              <el-input-number v-model="editForm.customQuotaMonthly" :min="0" controls-position="right"
+                style="width: 100%" placeholder="无限制" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="RPM 限制">
-              <el-input-number
-                v-model="editForm.custom_rpm_limit"
-                :min="0"
-                controls-position="right"
-                style="width: 100%"
-                placeholder="无限制"
-              />
+              <el-input-number v-model="editForm.customRpmLimit" :min="0" controls-position="right" style="width: 100%"
+                placeholder="无限制" />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-form-item label="备注" prop="notes">
-          <el-input
-            v-model="editForm.notes"
-            type="textarea"
-            :rows="2"
-            placeholder="可选备注信息"
-          />
+          <el-input v-model="editForm.notes" type="textarea" :rows="2" placeholder="可选备注信息" />
         </el-form-item>
       </el-form>
 
@@ -189,13 +138,13 @@ const availableModels = ref<Model[]>([])
 
 const editForm = reactive({
   name: '',
-  api_key: '',
-  selected_model_id: '',
+  apiKey: '',
+  selectedModelId: '',
   enabled: true,
   priority: 1,
-  custom_quota_daily: 0,
-  custom_quota_monthly: 0,
-  custom_rpm_limit: 0,
+  customQuotaDaily: 0,
+  customQuotaMonthly: 0,
+  customRpmLimit: 0,
   notes: ''
 })
 
@@ -210,7 +159,7 @@ const defaultPlanId = computed(() => {
 })
 
 const getProviderForPlan = (plan: UserPlan): Provider | undefined => {
-  return providers.value.find(p => p.provider_id === plan.provider_id)
+  return providers.value.find(p => p.providerId === plan.providerId)
 }
 
 // Load plans & providers
@@ -243,16 +192,16 @@ const loadProviderModels = async (providerId: string) => {
 // Open edit dialog
 const handleEdit = async (plan: UserPlan) => {
   editingPlan.value = plan
-  await loadProviderModels(plan.provider_id)
+  await loadProviderModels(plan.providerId)
 
   editForm.name = plan.name
-  editForm.api_key = ''
-  editForm.selected_model_id = plan.selected_model_id || ''
+  editForm.apiKey = ''
+  editForm.selectedModelId = plan.selectedModelId || ''
   editForm.enabled = plan.enabled
   editForm.priority = plan.priority || 1
-  editForm.custom_quota_daily = plan.custom_quota_daily || 0
-  editForm.custom_quota_monthly = plan.custom_quota_monthly || 0
-  editForm.custom_rpm_limit = plan.custom_rpm_limit || 0
+  editForm.customQuotaDaily = plan.customQuotaDaily || 0
+  editForm.customQuotaMonthly = plan.customQuotaMonthly || 0
+  editForm.customRpmLimit = plan.customRpmLimit || 0
   editForm.notes = plan.notes || ''
 
   editDialogVisible.value = true
@@ -274,24 +223,24 @@ const handleSaveEdit = async () => {
         notes: editForm.notes || undefined
       }
 
-      if (editForm.api_key.trim()) {
-        updateData.api_key = editForm.api_key.trim()
+      if (editForm.apiKey.trim()) {
+        updateData.apiKey = editForm.apiKey.trim()
       }
 
-      if (editForm.selected_model_id) {
-        updateData.selected_model_id = editForm.selected_model_id
+      if (editForm.selectedModelId) {
+        updateData.selectedModelId = editForm.selectedModelId
       }
 
-      if (editForm.custom_quota_daily > 0) {
-        updateData.custom_quota_daily = editForm.custom_quota_daily
+      if (editForm.customQuotaDaily > 0) {
+        updateData.customQuotaDaily = editForm.customQuotaDaily
       }
 
-      if (editForm.custom_quota_monthly > 0) {
-        updateData.custom_quota_monthly = editForm.custom_quota_monthly
+      if (editForm.customQuotaMonthly > 0) {
+        updateData.customQuotaMonthly = editForm.customQuotaMonthly
       }
 
-      if (editForm.custom_rpm_limit > 0) {
-        updateData.custom_rpm_limit = editForm.custom_rpm_limit
+      if (editForm.customRpmLimit > 0) {
+        updateData.customRpmLimit = editForm.customRpmLimit
       }
 
       const updated = await updatePlan(editingPlan.value.id, updateData)
@@ -364,7 +313,7 @@ const handleSetDefault = async (plan: UserPlan) => {
 const handleBindAgent = async (planId: string, agentId: string) => {
   try {
     const { default: api } = await import('@/api')
-    await api.post(`/plans/${planId}/agents/${agentId}/bind`, { auto_config: false })
+    await api.post(`/plans/${planId}/agents/${agentId}/bind`, { autoConfig: false })
     plans.value = await fetchPlans()
     ElMessage.success(`Agent ${agentId} 已绑定`)
   } catch {
@@ -410,8 +359,15 @@ onMounted(() => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .plans-header {

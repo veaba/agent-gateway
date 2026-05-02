@@ -7,15 +7,12 @@
       </div>
       <div class="header-actions">
         <el-select v-model="selectedPlanId" placeholder="全部套餐" clearable style="width: 180px">
-          <el-option
-            v-for="plan in plans"
-            :key="plan.id"
-            :label="plan.name"
-            :value="plan.id"
-          />
+          <el-option v-for="plan in plans" :key="plan.id" :label="plan.name" :value="plan.id" />
         </el-select>
         <el-button @click="loadData">
-          <el-icon><Refresh /></el-icon>
+          <el-icon>
+            <Refresh />
+          </el-icon>
           刷新
         </el-button>
       </div>
@@ -30,31 +27,32 @@
       </div>
 
       <div v-else class="quota-list">
-        <div v-for="quota in filteredQuotas" :key="quota.plan_id" class="quota-card">
+        <div v-for="quota in filteredQuotas" :key="quota.planId" class="quota-card">
           <div class="quota-card-header">
             <div class="plan-info">
-              <el-icon class="plan-icon"><Connection /></el-icon>
-              <span class="plan-name">{{ getPlanName(quota.plan_id) }}</span>
+              <el-icon class="plan-icon">
+                <Connection />
+              </el-icon>
+              <span class="plan-name">{{ getPlanName(quota.planId) }}</span>
             </div>
             <div class="header-tags">
-              <el-tag
-                v-if="quota.alert"
-                size="small"
-                round
-                :type="getAlertType(quota.alert.alert_type)"
-                class="alert-tag"
-              >
-                <el-icon><Warning /></el-icon>
-                {{ getAlertLabel(quota.alert.alert_type) }}
+              <el-tag v-if="quota.alert" size="small" round :type="getAlertType(quota.alert.alertType)"
+                class="alert-tag">
+                <el-icon>
+                  <Warning />
+                </el-icon>
+                {{ getAlertLabel(quota.alert.alertType) }}
               </el-tag>
-              <el-tag size="small" round :type="getPlanHealthType(quota.plan_id)">
-                {{ getPlanHealth(quota.plan_id) }}
+              <el-tag size="small" round :type="getPlanHealthType(quota.planId)">
+                {{ getPlanHealth(quota.planId) }}
               </el-tag>
             </div>
           </div>
 
           <div v-if="quota.alert" class="quota-alert-banner">
-            <el-icon><Warning /></el-icon>
+            <el-icon>
+              <Warning />
+            </el-icon>
             <span>{{ quota.alert.message }}</span>
           </div>
 
@@ -63,57 +61,53 @@
             <div class="metric-item">
               <div class="metric-header">
                 <span class="metric-label">
-                  <el-icon><Calendar /></el-icon>
+                  <el-icon>
+                    <Calendar />
+                  </el-icon>
                   日配额
                 </span>
                 <span class="metric-value agw-mono">
-                  {{ formatNumber(quota.usage.daily_used) }} / {{ quota.limits.daily ? formatNumber(quota.limits.daily) : '∞' }}
+                  {{ formatNumber(quota.usage.dailyUsed) }} / {{ quota.limits.daily ? formatNumber(quota.limits.daily)
+                    : '∞' }}
                 </span>
               </div>
-              <el-progress
-                :percentage="getPercent(quota.usage.daily_used, quota.limits.daily)"
-                :stroke-width="8"
-                :show-text="false"
-                :color="getQuotaColor(getPercent(quota.usage.daily_used, quota.limits.daily))"
-              />
+              <el-progress :percentage="getPercent(quota.usage.dailyUsed, quota.limits.daily)" :stroke-width="8"
+                :show-text="false" :color="getQuotaColor(getPercent(quota.usage.dailyUsed, quota.limits.daily))" />
             </div>
 
             <!-- Monthly Quota -->
             <div class="metric-item">
               <div class="metric-header">
                 <span class="metric-label">
-                  <el-icon><Month /></el-icon>
+                  <el-icon>
+                    <Month />
+                  </el-icon>
                   月配额
                 </span>
                 <span class="metric-value agw-mono">
-                  {{ formatNumber(quota.usage.monthly_used) }} / {{ quota.limits.monthly ? formatNumber(quota.limits.monthly) : '∞' }}
+                  {{ formatNumber(quota.usage.monthlyUsed) }} / {{ quota.limits.monthly ?
+                    formatNumber(quota.limits.monthly) : '∞' }}
                 </span>
               </div>
-              <el-progress
-                :percentage="getPercent(quota.usage.monthly_used, quota.limits.monthly)"
-                :stroke-width="8"
-                :show-text="false"
-                :color="getQuotaColor(getPercent(quota.usage.monthly_used, quota.limits.monthly))"
-              />
+              <el-progress :percentage="getPercent(quota.usage.monthlyUsed, quota.limits.monthly)" :stroke-width="8"
+                :show-text="false" :color="getQuotaColor(getPercent(quota.usage.monthlyUsed, quota.limits.monthly))" />
             </div>
 
             <!-- RPM -->
             <div class="metric-item">
               <div class="metric-header">
                 <span class="metric-label">
-                  <el-icon><Timer /></el-icon>
+                  <el-icon>
+                    <Timer />
+                  </el-icon>
                   RPM (请求/分钟)
                 </span>
                 <span class="metric-value agw-mono">
-                  {{ quota.usage.rpm_used }} / {{ quota.limits.rpm || '∞' }}
+                  {{ quota.usage.rpmUsed }} / {{ quota.limits.rpm || '∞' }}
                 </span>
               </div>
-              <el-progress
-                :percentage="getPercent(quota.usage.rpm_used, quota.limits.rpm)"
-                :stroke-width="8"
-                :show-text="false"
-                :color="getRpmColor(getPercent(quota.usage.rpm_used, quota.limits.rpm))"
-              />
+              <el-progress :percentage="getPercent(quota.usage.rpmUsed, quota.limits.rpm)" :stroke-width="8"
+                :show-text="false" :color="getRpmColor(getPercent(quota.usage.rpmUsed, quota.limits.rpm))" />
             </div>
           </div>
         </div>
@@ -137,7 +131,7 @@ const selectedPlanId = ref<string | undefined>(undefined)
 // Filtered quotas
 const filteredQuotas = computed(() => {
   if (!selectedPlanId.value) return quotas.value
-  return quotas.value.filter(q => q.plan_id === selectedPlanId.value)
+  return quotas.value.filter(q => q.planId === selectedPlanId.value)
 })
 
 // Load data
@@ -165,7 +159,7 @@ const getPlanName = (planId: string) => {
 
 const getPlanHealth = (planId: string) => {
   const plan = plans.value.find(p => p.id === planId)
-  const status = plan?.health_status || 'unknown'
+  const status = plan?.healthStatus || 'unknown'
   const labels: Record<string, string> = {
     healthy: '正常',
     warning: '警告',
@@ -178,7 +172,7 @@ const getPlanHealth = (planId: string) => {
 
 const getPlanHealthType = (planId: string) => {
   const plan = plans.value.find(p => p.id === planId)
-  const status = plan?.health_status || 'unknown'
+  const status = plan?.healthStatus || 'unknown'
   const types: Record<string, string> = {
     healthy: 'success',
     warning: 'warning',
@@ -214,10 +208,10 @@ const getAlertType = (alertType: string) => {
 
 const getAlertLabel = (alertType: string) => {
   const labels: Record<string, string> = {
-    daily_threshold: '日配额告警',
-    monthly_threshold: '月配额告警',
-    daily_exceeded: '日配额超额',
-    monthly_exceeded: '月配额超额'
+    dailyThreshold: '日配额告警',
+    monthlyThreshold: '月配额告警',
+    dailyExceeded: '日配额超额',
+    monthlyExceeded: '月配额超额'
   }
   return labels[alertType] || '配额告警'
 }
@@ -240,8 +234,15 @@ onMounted(() => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .quota-header {
