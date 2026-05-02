@@ -250,9 +250,9 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 20px;
   padding: 18px 24px;
-  background: rgba(20, 23, 34, 0.7);
+  background: var(--agw-bg-card);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--agw-border-default);
   border-radius: 14px;
 }
 
@@ -265,13 +265,13 @@ onMounted(() => {
 .section-title {
   font-size: 18px;
   font-weight: 700;
-  color: #e8eaf0;
+  color: var(--agw-text-primary);
   margin: 0;
 }
 
 .section-desc {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--agw-text-secondary);
   margin: 0;
 }
 
@@ -281,9 +281,9 @@ onMounted(() => {
 }
 
 .quota-cards {
-  background: rgba(20, 23, 34, 0.7);
+  background: var(--agw-bg-card);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--agw-border-default);
   border-radius: 14px;
   padding: 20px;
 }
@@ -300,16 +300,16 @@ onMounted(() => {
 }
 
 .quota-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--agw-bg-hover);
+  border: 1px solid var(--agw-border-default);
   border-radius: 12px;
   padding: 18px;
   transition: all 0.3s ease;
 }
 
 .quota-card:hover {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--agw-border-active);
+  background: var(--agw-bg-elevated);
 }
 
 .quota-card-header {
@@ -318,7 +318,7 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--agw-border-subtle);
 }
 
 .plan-info {
@@ -335,7 +335,7 @@ onMounted(() => {
 .plan-name {
   font-weight: 600;
   font-size: 15px;
-  color: #e8eaf0;
+  color: var(--agw-text-primary);
 }
 
 .quota-metrics {
@@ -361,13 +361,13 @@ onMounted(() => {
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--agw-text-secondary);
 }
 
 .metric-value {
   font-size: 12px;
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--agw-text-secondary);
 }
 
 .header-tags {
@@ -390,8 +390,8 @@ onMounted(() => {
   gap: 8px;
   padding: 10px 12px;
   margin-bottom: 14px;
-  background: rgba(244, 63, 94, 0.08);
-  border: 1px solid rgba(244, 63, 94, 0.2);
+  background: var(--agw-rose-dim);
+  border: 1px solid var(--agw-border-active);
   border-radius: 8px;
   font-size: 12px;
   color: #fb7185;

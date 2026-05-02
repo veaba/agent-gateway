@@ -133,10 +133,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { healthCheck } from '@/api'
 import { useGateway } from '@/composables/useGateway'
+import { useTheme, type ThemeMode } from '@/composables/useTheme'
 
 const saving = ref(false)
 const isConnected = ref(false)
@@ -145,10 +146,21 @@ const gatewayLoading = ref(false)
 const buildTime = ref('2024-01-15')
 
 const { startGateway: doStartGateway, stopGateway: doStopGateway, getGatewayStatus } = useGateway()
+const { theme, setTheme } = useTheme()
 
 const settings = reactive({
   log_level: 'info',
-  theme: 'dark'
+  theme: 'dark' as ThemeMode
+})
+
+// Sync settings.theme with useTheme's theme ref
+watch(theme, (newTheme) => {
+  settings.theme = newTheme
+})
+
+// Immediately apply theme when user changes selection
+watch(() => settings.theme, (newTheme) => {
+  setTheme(newTheme)
 })
 
 const gatewaySettings = reactive({
@@ -156,15 +168,20 @@ const gatewaySettings = reactive({
 })
 
 const loadSettings = () => {
+  // Reset log_level only, theme is managed by useTheme
   settings.log_level = 'info'
-  settings.theme = 'dark'
 }
 
 const handleSave = async () => {
   saving.value = true
   try {
     await new Promise(resolve => setTimeout(resolve, 500))
-    localStorage.setItem('agw-settings', JSON.stringify(settings))
+    // Theme is already saved by setTheme in the watcher
+    // Save other settings
+    const saved = localStorage.getItem('agw-settings') || '{}'
+    const existing = JSON.parse(saved)
+    existing.log_level = settings.log_level
+    localStorage.setItem('agw-settings', JSON.stringify(existing))
     ElMessage.success('设置已保存')
   } catch {
     ElMessage.error('保存失败')
@@ -178,7 +195,10 @@ const loadSettingsFromStorage = () => {
     const saved = localStorage.getItem('agw-settings')
     if (saved) {
       const parsed = JSON.parse(saved)
-      Object.assign(settings, parsed)
+      if (parsed.log_level) {
+        settings.log_level = parsed.log_level
+      }
+      // Theme is loaded by useTheme composable
     }
   } catch {
     // Ignore
@@ -245,9 +265,9 @@ onMounted(async () => {
 }
 
 .settings-card {
-  background: rgba(20, 23, 34, 0.7);
+  background: var(--agw-bg-card);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--agw-border-default);
   border-radius: 14px;
 }
 
@@ -260,7 +280,7 @@ onMounted(async () => {
 .card-title {
   font-size: 15px;
   font-weight: 600;
-  color: #e8eaf0;
+  color: var(--agw-text-primary);
 }
 
 .settings-form {
@@ -269,7 +289,7 @@ onMounted(async () => {
 
 .form-tip {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--agw-text-secondary);
   margin-top: 4px;
 }
 
@@ -287,14 +307,14 @@ onMounted(async () => {
 
 .about-label {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--agw-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .about-value {
   font-size: 14px;
-  color: #e8eaf0;
+  color: var(--agw-text-primary);
 }
 
 .about-footer {
@@ -305,7 +325,7 @@ onMounted(async () => {
 
 .about-desc {
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--agw-text-secondary);
   margin: 0;
   line-height: 1.6;
 }

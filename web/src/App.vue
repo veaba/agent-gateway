@@ -4,7 +4,9 @@
       <el-aside width="248px" class="sidebar">
         <div class="logo-container">
           <div class="logo-icon">
-            <el-icon :size="26"><DataBoard /></el-icon>
+            <el-icon :size="26">
+              <DataBoard />
+            </el-icon>
           </div>
           <div class="logo-text-group">
             <span class="logo-text">Agent Gateway</span>
@@ -12,47 +14,60 @@
           </div>
         </div>
 
-        <el-menu
-          :default-active="$route.path"
-          router
-          class="sidebar-menu"
-          :popper-class="'sidebar-popper'"
-        >
+        <el-menu :default-active="$route.path" router class="sidebar-menu" :popper-class="'sidebar-popper'">
           <el-menu-item index="/">
-            <el-icon><HomeFilled /></el-icon>
+            <el-icon>
+              <HomeFilled />
+            </el-icon>
             <span>仪表盘</span>
           </el-menu-item>
           <el-menu-item index="/plans">
-            <el-icon><Connection /></el-icon>
+            <el-icon>
+              <Connection />
+            </el-icon>
             <span>我的套餐</span>
           </el-menu-item>
           <el-menu-item index="/fallback">
-            <el-icon><RefreshLeft /></el-icon>
+            <el-icon>
+              <RefreshLeft />
+            </el-icon>
             <span>降级策略</span>
           </el-menu-item>
           <el-menu-item index="/quota">
-            <el-icon><DataLine /></el-icon>
+            <el-icon>
+              <DataLine />
+            </el-icon>
             <span>配额使用</span>
           </el-menu-item>
           <el-menu-item index="/stats">
-            <el-icon><TrendCharts /></el-icon>
+            <el-icon>
+              <TrendCharts />
+            </el-icon>
             <span>统计数据</span>
           </el-menu-item>
           <el-menu-item index="/logs">
-            <el-icon><Tickets /></el-icon>
+            <el-icon>
+              <Tickets />
+            </el-icon>
             <span>请求日志</span>
           </el-menu-item>
           <el-menu-item index="/plugins">
-            <el-icon><Box /></el-icon>
+            <el-icon>
+              <Box />
+            </el-icon>
             <span>插件管理</span>
           </el-menu-item>
           <div class="menu-divider"></div>
           <el-menu-item index="/guide">
-            <el-icon><Guide /></el-icon>
+            <el-icon>
+              <Guide />
+            </el-icon>
             <span>配置引导</span>
           </el-menu-item>
           <el-menu-item index="/settings">
-            <el-icon><Setting /></el-icon>
+            <el-icon>
+              <Setting />
+            </el-icon>
             <span>设置</span>
           </el-menu-item>
         </el-menu>
@@ -79,7 +94,9 @@
               <el-button circle :icon="Bell" class="icon-btn" />
             </el-badge>
             <el-button type="primary" class="add-btn" @click="$router.push('/plans/add')">
-              <el-icon><Plus /></el-icon>
+              <el-icon>
+                <Plus />
+              </el-icon>
               添加套餐
             </el-button>
           </div>
@@ -89,9 +106,11 @@
           <router-view v-slot="{ Component }">
             <transition name="fade-slide" mode="out-in">
               <component :is="Component" v-if="Component" :key="$route.path" />
+
             </transition>
           </router-view>
         </el-main>
+        <p class='copyright'>copyright © 2026 Agent Gateway. All rights reserved.</p>
       </el-container>
     </el-container>
   </div>
@@ -102,6 +121,10 @@ import { computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { Bell } from '@element-plus/icons-vue'
 import { healthCheck } from '@/api'
+import { useTheme } from '@/composables/useTheme'
+
+// Initialize theme globally (handles auto mode system preference listener)
+useTheme()
 
 const route = useRoute()
 const isConnected = ref(false)
@@ -153,12 +176,12 @@ onMounted(() => {
 
 /* ── Sidebar ── */
 .sidebar {
-  background: linear-gradient(180deg, #0d1018 0%, #0a0d14 100%);
+  background: var(--agw-bg-card);
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid var(--agw-border-subtle);
 }
 
 .sidebar-glow {
@@ -177,7 +200,7 @@ onMounted(() => {
   align-items: center;
   gap: 12px;
   padding: 20px 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--agw-border-subtle);
 }
 
 .logo-icon {
@@ -202,7 +225,7 @@ onMounted(() => {
 .logo-text {
   font-size: 15px;
   font-weight: 700;
-  color: #e8eaf0;
+  color: var(--agw-text-primary);
   letter-spacing: -0.3px;
   line-height: 1.2;
 }
@@ -210,7 +233,7 @@ onMounted(() => {
 .logo-sub {
   font-size: 10px;
   font-weight: 500;
-  color: #4a5068;
+  color: var(--agw-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -225,7 +248,7 @@ onMounted(() => {
 
 .menu-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--agw-border-subtle);
   margin: 8px 12px;
 }
 
@@ -234,22 +257,21 @@ onMounted(() => {
   line-height: 44px;
   margin: 2px 0;
   border-radius: 10px;
-  color: #8b92a8;
+  color: var(--agw-text-secondary);
   font-size: 14px;
   transition: all 0.25s ease;
   position: relative;
 }
 
 .sidebar-menu :deep(.el-menu-item:hover) {
-  background: rgba(255, 255, 255, 0.04);
-  color: #c4c9d8;
+  background: var(--agw-bg-hover);
+  color: var(--agw-text-primary);
 }
 
 .sidebar-menu :deep(.el-menu-item.is-active) {
-  background: linear-gradient(90deg, rgba(14, 165, 233, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%);
-  color: #38bdf8;
+  background: var(--agw-sky-dim);
+  color: var(--agw-sky);
   font-weight: 600;
-  box-shadow: inset 0 0 0 1px rgba(14, 165, 233, 0.2);
 }
 
 .sidebar-menu :deep(.el-menu-item .el-icon) {
@@ -261,7 +283,7 @@ onMounted(() => {
 /* ── Sidebar Footer ── */
 .sidebar-footer {
   padding: 14px 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--agw-border-subtle);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -272,14 +294,14 @@ onMounted(() => {
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: #4a5068;
+  color: var(--agw-text-muted);
 }
 
 .status-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #4a5068;
+  background: var(--agw-text-muted);
   transition: all 0.3s ease;
 }
 
@@ -294,7 +316,7 @@ onMounted(() => {
 
 .version-info {
   font-size: 11px;
-  color: #2a2f3a;
+  color: var(--agw-text-muted);
   font-family: var(--agw-font-mono, monospace);
 }
 
@@ -302,15 +324,15 @@ onMounted(() => {
 .main-container {
   display: flex;
   flex-direction: column;
-  background: var(--el-bg-color-page, #0f1117);
+  background: var(--agw-bg-page);
 }
 
 /* ── Header ── */
 .app-header {
-  background: rgba(15, 17, 23, 0.85);
+  background: var(--agw-bg-card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--agw-border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -330,14 +352,14 @@ onMounted(() => {
 .page-title {
   font-size: 20px;
   font-weight: 700;
-  color: #e8eaf0;
+  color: var(--agw-text-primary);
   margin: 0;
   letter-spacing: -0.5px;
 }
 
 .page-breadcrumb {
   font-size: 13px;
-  color: #4a5068;
+  color: var(--agw-text-muted);
 }
 
 .header-right {
@@ -347,17 +369,17 @@ onMounted(() => {
 }
 
 .icon-btn {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  color: #8b92a8;
+  background: var(--agw-bg-hover);
+  border: 1px solid var(--agw-border-default);
+  color: var(--agw-text-secondary);
   width: 36px;
   height: 36px;
 }
 
 .icon-btn:hover {
-  background: rgba(255, 255, 255, 0.07);
-  color: #c4c9d8;
-  border-color: rgba(255, 255, 255, 0.1);
+  background: var(--agw-bg-elevated);
+  color: var(--agw-text-primary);
+  border-color: var(--agw-border-active);
 }
 
 .header-badge :deep(.el-badge__content) {
@@ -404,5 +426,12 @@ onMounted(() => {
 .fade-slide-leave-to {
   opacity: 0;
   transform: translateX(-16px);
+}
+
+.copyright {
+  text-align: center;
+  font-size: 12px;
+  color: var(--agw-text-muted);
+  padding: 12px 0;
 }
 </style>

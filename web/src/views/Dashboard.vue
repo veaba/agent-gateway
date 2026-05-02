@@ -353,9 +353,9 @@ onMounted(() => {
 
 .stat-card {
   position: relative;
-  background: rgba(20, 23, 34, 0.7);
+  background: var(--agw-bg-card);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--agw-border-default);
   border-radius: 14px;
   padding: 20px;
   display: flex;
@@ -367,8 +367,8 @@ onMounted(() => {
 
 .stat-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border-color: var(--agw-border-active);
+  box-shadow: var(--el-box-shadow);
 }
 
 .stat-icon {
@@ -382,22 +382,22 @@ onMounted(() => {
 }
 
 .stat-card-cyan .stat-icon {
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(6, 182, 212, 0.15));
+  background: var(--agw-sky-dim);
   color: #38bdf8;
 }
 
 .stat-card-emerald .stat-icon {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(0, 212, 170, 0.15));
+  background: var(--agw-cyan-dim);
   color: #34d399;
 }
 
 .stat-card-sky .stat-icon {
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(34, 211, 238, 0.12));
+  background: var(--agw-sky-dim);
   color: #22d3ee;
 }
 
 .stat-card-rose .stat-icon {
-  background: linear-gradient(135deg, rgba(244, 63, 94, 0.2), rgba(239, 68, 68, 0.15));
+  background: var(--agw-rose-dim);
   color: #fb7185;
 }
 
@@ -409,13 +409,13 @@ onMounted(() => {
 .stat-value {
   font-size: 26px;
   font-weight: 700;
-  color: #e8eaf0;
+  color: var(--agw-text-primary);
   line-height: 1.2;
 }
 
 .stat-label {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--agw-text-secondary);
   margin-top: 4px;
 }
 
@@ -449,9 +449,9 @@ onMounted(() => {
 }
 
 .content-card {
-  background: rgba(20, 23, 34, 0.7);
+  background: var(--agw-bg-card);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--agw-border-default);
   border-radius: 14px;
   padding: 20px;
   margin-bottom: 20px;
@@ -467,7 +467,7 @@ onMounted(() => {
 .card-title {
   font-size: 15px;
   font-weight: 600;
-  color: #e8eaf0;
+  color: var(--agw-text-primary);
 }
 
 .card-actions {
@@ -485,31 +485,31 @@ onMounted(() => {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #6b7280;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--agw-text-secondary);
+  border-bottom: 1px solid var(--agw-border-subtle);
 }
 
 .dashboard-table :deep(td.el-table__cell) {
   font-size: 13px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--agw-border-subtle);
 }
 
 .dashboard-table :deep(.el-table__row--striped td.el-table__cell) {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--agw-bg-hover);
 }
 
 .plan-name {
   font-weight: 500;
-  color: #e8eaf0;
+  color: var(--agw-text-primary);
 }
 
 .model-badge {
   font-family: var(--agw-font-mono, monospace);
   font-size: 12px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--agw-bg-hover);
   padding: 2px 8px;
   border-radius: 4px;
-  color: #94a3b8;
+  color: var(--agw-text-secondary);
 }
 
 .status-tag {
@@ -519,7 +519,7 @@ onMounted(() => {
 
 .latency-value {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--agw-text-secondary);
 }
 
 .latency-value.latency-high {
@@ -539,24 +539,24 @@ onMounted(() => {
   gap: 14px;
   padding: 14px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: var(--agw-bg-hover);
+  border: 1px solid var(--agw-border-subtle);
   cursor: pointer;
   transition: all 0.25s ease;
 }
 
 .action-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--agw-bg-elevated);
   transform: translateX(3px);
 }
 
 .action-item.action-primary {
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(6, 182, 212, 0.1));
-  border-color: rgba(14, 165, 233, 0.2);
+  background: var(--agw-sky-dim);
+  border-color: var(--agw-border-active);
 }
 
 .action-item.action-primary:hover {
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(6, 182, 212, 0.15));
+  background: var(--agw-sky-dim);
 }
 
 .action-icon {
@@ -566,8 +566,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  color: #8b92a8;
+  background: var(--agw-bg-elevated);
+  color: var(--agw-text-secondary);
   flex-shrink: 0;
 }
 
@@ -584,17 +584,17 @@ onMounted(() => {
 .action-title {
   font-size: 14px;
   font-weight: 600;
-  color: #e8eaf0;
+  color: var(--agw-text-primary);
 }
 
 .action-desc {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--agw-text-secondary);
   margin-top: 1px;
 }
 
 .action-arrow {
-  color: #4a5068;
+  color: var(--agw-text-muted);
   transition: all 0.25s ease;
 }
 
@@ -628,13 +628,13 @@ onMounted(() => {
 
 .quota-plan-name {
   font-size: 13px;
-  color: #c4c9d8;
+  color: var(--agw-text-secondary);
 }
 
 .quota-percent {
   font-size: 12px;
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--agw-text-secondary);
 }
 
 .alert-icon {
@@ -649,8 +649,8 @@ onMounted(() => {
 
 .quota-item.quota-alert {
   padding: 8px 10px;
-  background: rgba(244, 63, 94, 0.05);
+  background: var(--agw-rose-dim);
   border-radius: 8px;
-  border: 1px solid rgba(244, 63, 94, 0.1);
+  border: 1px solid var(--agw-border-active);
 }
 </style>

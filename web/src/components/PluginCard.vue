@@ -106,9 +106,9 @@ const getStatusLabel = (status: string) => {
 <style scoped>
 .plugin-card {
   position: relative;
-  background: rgba(20, 23, 34, 0.7);
+  background: var(--agw-bg-card);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--agw-border-default);
   border-radius: 14px;
   padding: 18px;
   overflow: hidden;
@@ -116,9 +116,9 @@ const getStatusLabel = (status: string) => {
 }
 
 .plugin-card:hover {
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--agw-border-active);
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--el-box-shadow);
 }
 
 .plugin-card.is-enabled {
@@ -157,7 +157,7 @@ const getStatusLabel = (status: string) => {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(6, 182, 212, 0.15));
+  background: var(--agw-sky-dim);
   color: #38bdf8;
   display: flex;
   align-items: center;
@@ -174,12 +174,12 @@ const getStatusLabel = (status: string) => {
 .plugin-name {
   font-weight: 600;
   font-size: 15px;
-  color: #e8eaf0;
+  color: var(--agw-text-primary);
 }
 
 .plugin-version {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--agw-text-secondary);
   font-family: var(--agw-font-mono, monospace);
 }
 
@@ -194,7 +194,7 @@ const getStatusLabel = (status: string) => {
 
 .plugin-description {
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--agw-text-secondary);
   margin: 0 0 12px 0;
   line-height: 1.5;
 }
@@ -209,14 +209,14 @@ const getStatusLabel = (status: string) => {
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--agw-text-secondary);
 }
 
 .plugin-actions {
   display: flex;
   gap: 8px;
   padding-top: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--agw-border-subtle);
 }
 
 .action-btn {

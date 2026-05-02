@@ -208,9 +208,9 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 20px;
   padding: 18px 24px;
-  background: rgba(20, 23, 34, 0.7);
+  background: var(--agw-bg-card);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--agw-border-default);
   border-radius: 14px;
 }
 
@@ -223,13 +223,13 @@ onMounted(() => {
 .section-title {
   font-size: 18px;
   font-weight: 700;
-  color: #e8eaf0;
+  color: var(--agw-text-primary);
   margin: 0;
 }
 
 .section-desc {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--agw-text-secondary);
   margin: 0;
 }
 
@@ -243,9 +243,9 @@ onMounted(() => {
 }
 
 .logs-content {
-  background: rgba(20, 23, 34, 0.7);
+  background: var(--agw-bg-card);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--agw-border-default);
   border-radius: 14px;
   overflow: hidden;
 }
@@ -260,40 +260,40 @@ onMounted(() => {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #6b7280;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--agw-text-secondary);
+  border-bottom: 1px solid var(--agw-border-subtle);
 }
 
 .logs-table :deep(td.el-table__cell) {
   font-size: 13px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--agw-border-subtle);
 }
 
 .logs-table :deep(.el-table__row--striped td.el-table__cell) {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--agw-bg-hover);
 }
 
 .time-value {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--agw-text-secondary);
 }
 
 .plan-name {
   font-weight: 500;
-  color: #e8eaf0;
+  color: var(--agw-text-primary);
 }
 
 .agent-badge {
   font-size: 12px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--agw-bg-hover);
   padding: 2px 8px;
   border-radius: 4px;
-  color: #94a3b8;
+  color: var(--agw-text-secondary);
 }
 
 .model-badge {
   font-size: 11px;
-  background: rgba(14, 165, 233, 0.1);
+  background: var(--agw-sky-dim);
   padding: 2px 8px;
   border-radius: 4px;
   color: #38bdf8;
@@ -306,7 +306,7 @@ onMounted(() => {
 
 .latency-value {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--agw-text-secondary);
 }
 
 .latency-medium { color: #f59e0b; }
@@ -318,11 +318,11 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--agw-border-subtle);
 }
 
 .logs-count {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--agw-text-secondary);
 }
 </style>

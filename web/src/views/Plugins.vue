@@ -196,9 +196,9 @@ const handleUninstall = async (id: string) => {
   align-items: center;
   margin-bottom: 24px;
   padding: 20px 24px;
-  background: rgba(20, 23, 34, 0.7);
+  background: var(--agw-bg-card);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--agw-border-default);
   border-radius: 14px;
 }
 
@@ -211,13 +211,13 @@ const handleUninstall = async (id: string) => {
 .section-title {
   font-size: 20px;
   font-weight: 700;
-  color: #e8eaf0;
+  color: var(--agw-text-primary);
   margin: 0;
 }
 
 .section-desc {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--agw-text-secondary);
   margin: 0;
 }
 
@@ -239,25 +239,25 @@ const handleUninstall = async (id: string) => {
 /* Loading State */
 .loading-state {
   padding: 40px;
-  background: rgba(20, 23, 34, 0.5);
+  background: var(--agw-bg-card);
   border-radius: 14px;
 }
 
 /* Empty State */
 .empty-state {
   padding: 60px 20px;
-  background: rgba(20, 23, 34, 0.5);
+  background: var(--agw-bg-card);
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--agw-border-subtle);
 }
 
 .empty-icon {
-  color: #4a5068;
+  color: var(--agw-text-muted);
   opacity: 0.5;
 }
 
 .empty-desc {
-  color: #6b7280;
+  color: var(--agw-text-secondary);
   font-size: 14px;
 }
 
@@ -271,7 +271,7 @@ const handleUninstall = async (id: string) => {
 /* Form Tip */
 .form-tip {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--agw-text-secondary);
   margin-top: 6px;
 }
 </style>
