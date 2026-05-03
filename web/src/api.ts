@@ -14,6 +14,8 @@ import type {
   FallbackStats,
   ProviderPerformance,
   Agent,
+  CustomAgent,
+  CustomProvider,
 } from "./types";
 
 const api = axios.create({
@@ -30,6 +32,11 @@ export async function fetchProviders(): Promise<Provider[]> {
 export async function fetchProvider(providerId: string): Promise<Provider> {
   const { data } = await api.get(`/providers/${providerId}`);
   return data.data;
+}
+
+export async function updateProviders(): Promise<Provider[]> {
+  const { data } = await api.post("/providers/update");
+  return data.data.providers;
 }
 
 // Plan APIs
@@ -125,6 +132,46 @@ export async function unbindAgent(planId: string, agentId: string): Promise<void
 
 export async function autoConfigAgent(planId: string, agentId: string): Promise<void> {
   await api.post(`/plans/${planId}/agents/${agentId}/auto-config`);
+}
+
+// Custom Agent APIs
+export async function fetchCustomAgents(): Promise<CustomAgent[]> {
+  const { data } = await api.get("/custom-agents");
+  return data.data.customAgents;
+}
+
+export async function createCustomAgent(agent: Partial<CustomAgent>): Promise<CustomAgent> {
+  const { data } = await api.post("/custom-agents", agent);
+  return data.data;
+}
+
+export async function updateCustomAgent(id: string, agent: Partial<CustomAgent>): Promise<CustomAgent> {
+  const { data } = await api.put(`/custom-agents/${id}`, agent);
+  return data.data;
+}
+
+export async function deleteCustomAgent(id: string): Promise<void> {
+  await api.delete(`/custom-agents/${id}`);
+}
+
+// Custom Provider APIs
+export async function fetchCustomProviders(): Promise<CustomProvider[]> {
+  const { data } = await api.get("/custom-providers");
+  return data.data.customProviders;
+}
+
+export async function createCustomProvider(provider: Partial<CustomProvider>): Promise<CustomProvider> {
+  const { data } = await api.post("/custom-providers", provider);
+  return data.data;
+}
+
+export async function updateCustomProvider(id: string, provider: Partial<CustomProvider>): Promise<CustomProvider> {
+  const { data } = await api.put(`/custom-providers/${id}`, provider);
+  return data.data;
+}
+
+export async function deleteCustomProvider(id: string): Promise<void> {
+  await api.delete(`/custom-providers/${id}`);
 }
 
 // Stats APIs

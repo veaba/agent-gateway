@@ -3,7 +3,7 @@
 use std::path::PathBuf;
 use anyhow::Result;
 
-use crate::model::{UserPlansConfig, ProvidersConfig, FallbackConfig};
+use crate::model::{UserPlansConfig, ProvidersConfig, FallbackConfig, CustomAgentsConfig, CustomProvidersConfig};
 
 /// 配置存储
 pub struct ConfigStore {
@@ -111,6 +111,48 @@ impl ConfigStore {
         tokio::fs::create_dir_all(&data_dir).await?;
         tokio::fs::create_dir_all(data_dir.join("logs")).await?;
         tokio::fs::create_dir_all(data_dir.join("plugins")).await?;
+        Ok(())
+    }
+
+    /// 加载自定义 Agent 配置
+    pub async fn load_custom_agents(&self) -> Result<CustomAgentsConfig> {
+        let path = self.config_dir.join("custom_agents.yaml");
+
+        if !path.exists() {
+            return Ok(CustomAgentsConfig::default());
+        }
+
+        let content = tokio::fs::read_to_string(&path).await?;
+        let config: CustomAgentsConfig = serde_yaml::from_str(&content)?;
+        Ok(config)
+    }
+
+    /// 保存自定义 Agent 配置
+    pub async fn save_custom_agents(&self, config: &CustomAgentsConfig) -> Result<()> {
+        let path = self.config_dir.join("custom_agents.yaml");
+        let content = serde_yaml::to_string(config)?;
+        tokio::fs::write(&path, content).await?;
+        Ok(())
+    }
+
+    /// 加载自定义 Provider 配置
+    pub async fn load_custom_providers(&self) -> Result<CustomProvidersConfig> {
+        let path = self.config_dir.join("custom_providers.yaml");
+
+        if !path.exists() {
+            return Ok(CustomProvidersConfig::default());
+        }
+
+        let content = tokio::fs::read_to_string(&path).await?;
+        let config: CustomProvidersConfig = serde_yaml::from_str(&content)?;
+        Ok(config)
+    }
+
+    /// 保存自定义 Provider 配置
+    pub async fn save_custom_providers(&self, config: &CustomProvidersConfig) -> Result<()> {
+        let path = self.config_dir.join("custom_providers.yaml");
+        let content = serde_yaml::to_string(config)?;
+        tokio::fs::write(&path, content).await?;
         Ok(())
     }
 }

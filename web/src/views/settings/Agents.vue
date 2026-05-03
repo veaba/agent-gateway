@@ -5,37 +5,50 @@
         <h2 class="section-title">Agent 工具管理</h2>
         <p class="section-desc">管理 AI 编码工具的绑定与配置</p>
       </div>
-      <el-button type="primary" size="large" class="refresh-btn" :loading="isLoading" @click="loadData">
-        <el-icon>
-          <Refresh />
-        </el-icon>
-        刷新
-      </el-button>
+      <div class="header-actions">
+        <el-button type="success" size="large" class="add-btn" @click="showCreateDialog">
+          <el-icon>
+            <Plus />
+          </el-icon>
+          添加工具
+        </el-button>
+        <el-button type="primary" size="large" class="refresh-btn" :loading="isLoading" @click="loadData">
+          <el-icon>
+            <Refresh />
+          </el-icon>
+          刷新
+        </el-button>
+      </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="isLoading && agents.length === 0" class="loading-state">
+    <div v-if="isLoading && allAgents.length === 0" class="loading-state">
       <el-skeleton :rows="4" animated />
     </div>
 
     <!-- Empty State -->
-    <el-empty v-else-if="agents.length === 0" description="没有可用的 Agent 工具" class="empty-state">
+    <el-empty v-else-if="allAgents.length === 0" description="没有可用的 Agent 工具" class="empty-state">
       <template #image>
         <el-icon :size="80" class="empty-icon">
           <Robot />
         </el-icon>
       </template>
       <template #description>
-        <p class="empty-desc">请先配置服务商以获取可用 Agent</p>
+        <p class="empty-desc">请先配置服务商以获取可用 Agent，或添加自定义工具</p>
       </template>
-      <el-button type="primary" size="large" @click="$router.push('/providers')">
-        配置服务商
-      </el-button>
+      <div class="empty-actions">
+        <el-button type="success" size="large" @click="showCreateDialog">
+          添加自定义工具
+        </el-button>
+        <el-button type="primary" size="large" @click="$router.push('/providers')">
+          配置服务商
+        </el-button>
+      </div>
     </el-empty>
 
     <!-- Agents Grid -->
     <div v-else class="agents-grid agw-stagger">
-      <div v-for="agent in agents" :key="agent.agent_id" class="agent-card">
+      <div v-for="agent in allAgents" :key="agent.agent_id" class="agent-card" :class="{ 'custom-agent': agent.isCustom }">
         <div class="agent-header">
           <div class="agent-icon">
             <img v-if="agent.logo_url" :src="agent.logo_url" :alt="agent.name" class="logo-img" />
@@ -47,13 +60,22 @@
             <h3 class="agent-name">{{ agent.name }}</h3>
             <span class="agent-id">{{ agent.agent_id }}</span>
           </div>
+          <!-- Custom agent badge -->
+          <el-tag v-if="agent.isCustom" type="success" size="small" class="custom-badge">
+            自定义
+          </el-tag>
         </div>
 
         <div class="agent-desc" v-if="agent.description">
           {{ agent.description }}
         </div>
 
-        <div class="agent-meta">
+        <!-- Version for custom agents -->
+        <div class="agent-version" v-if="agent.isCustom && agent.version">
+          <el-tag type="info" size="small">v{{ agent.version }}</el-tag>
+        </div>
+
+        <div class="agent-meta" v-if="!agent.isCustom">
           <div class="meta-item" v-if="agent.supported_formats?.length">
             <span class="meta-label">支持协议:</span>
             <span class="meta-value">{{ agent.supported_formats.join(', ') }}</span>
@@ -64,7 +86,7 @@
           </div>
         </div>
 
-        <div class="agent-links" v-if="agent.homepage || agent.install_url">
+        <div class="agent-links" v-if="!agent.isCustom && (agent.homepage || agent.install_url)">
           <el-link v-if="agent.homepage" :href="agent.homepage" target="_blank" type="primary" :underline="false">
             <el-icon><Link /></el-icon>
             官网
@@ -73,6 +95,18 @@
             <el-icon><Download /></el-icon>
             安装
           </el-link>
+        </div>
+
+        <!-- Custom agent actions -->
+        <div class="custom-actions" v-if="agent.isCustom">
+          <el-button type="primary" size="small" plain @click="showEditDialog(agent)">
+            <el-icon><Edit /></el-icon>
+            编辑
+          </el-button>
+          <el-button type="danger" size="small" plain @click="handleDeleteCustom(agent)">
+            <el-icon><Delete /></el-icon>
+            删除
+          </el-button>
         </div>
 
         <el-divider />
@@ -100,7 +134,7 @@
               </div>
               <div class="plan-actions">
                 <el-button
-                  v-if="getAgentBinding(plan.id, agent.agent_id)?.config_status === 'not_configured'"
+                  v-if="!agent.isCustom && getAgentBinding(plan.id, agent.agent_id)?.config_status === 'not_configured'"
                   type="primary"
                   size="small"
                   @click="handleAutoConfig(plan.id, agent.agent_id)"
@@ -141,32 +175,91 @@
         </div>
       </div>
     </div>
+
+    <!-- Create/Edit Custom Agent Dialog -->
+    <el-dialog
+      v-model="dialogVisible"
+      :title="editingAgent ? '编辑自定义工具' : '添加自定义工具'"
+      width="500px"
+      :close-on-click-modal="false"
+    >
+      <el-form :model="dialogForm" label-width="100px" class="dialog-form">
+        <el-form-item label="工具名称" required>
+          <el-input v-model="dialogForm.name" placeholder="例如：My Custom Tool" />
+        </el-form-item>
+        <el-form-item label="工具代码" required>
+          <el-input
+            v-model="dialogForm.agentId"
+            placeholder="例如：my-custom-tool"
+            :disabled="!!editingAgent"
+          />
+          <div class="form-tip">唯一标识符，创建后不可修改</div>
+        </el-form-item>
+        <el-form-item label="版本号" required>
+          <el-input v-model="dialogForm.version" placeholder="例如：1.0.0" />
+        </el-form-item>
+        <el-form-item label="图标 URL">
+          <el-input v-model="dialogForm.logoUrl" placeholder="https://..." />
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input v-model="dialogForm.description" type="textarea" :rows="3" placeholder="工具描述..." />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleSaveCustom" :loading="dialogLoading">
+          {{ editingAgent ? '保存' : '创建' }}
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { useAgents } from '@/composables/useAgents'
 import { statusLabels } from '@/constants/HealthLabel'
+import type { CustomAgent } from '@/types'
 
 const {
   agents,
+  customAgents,
   plans,
   isLoading,
   loadAgents,
+  loadCustomAgents,
   loadPlans,
   bind,
   unbind,
   autoConfig,
+  createCustom,
+  updateCustom,
+  deleteCustom,
   getAgentBinding,
-  getPlansWithAgent
+  getPlansWithAgent,
+  getAllAgents,
 } = useAgents()
 
 const selectedPlanForAgent = reactive<Record<string, string>>({})
 
+// Dialog state
+const dialogVisible = ref(false)
+const dialogLoading = ref(false)
+const editingAgent = ref<CustomAgent | null>(null)
+const dialogForm = reactive({
+  name: '',
+  agentId: '',
+  version: '',
+  logoUrl: '',
+  description: '',
+})
+
+// Combined agents list
+const allAgents = computed(() => getAllAgents())
+
 const loadData = async () => {
-  await Promise.all([loadAgents(), loadPlans()])
+  await Promise.all([loadAgents(), loadCustomAgents(), loadPlans()])
 }
 
 // Get plans that don't have this agent bound
@@ -226,6 +319,94 @@ const handleAutoConfig = async (planId: string, agentId: string) => {
   }
 }
 
+// Custom agent dialog handlers
+const showCreateDialog = () => {
+  editingAgent.value = null
+  dialogForm.name = ''
+  dialogForm.agentId = ''
+  dialogForm.version = '1.0.0'
+  dialogForm.logoUrl = ''
+  dialogForm.description = ''
+  dialogVisible.value = true
+}
+
+const showEditDialog = (agent: any) => {
+  editingAgent.value = agent
+  dialogForm.name = agent.name
+  dialogForm.agentId = agent.agent_id
+  dialogForm.version = agent.version || '1.0.0'
+  dialogForm.logoUrl = agent.logo_url || ''
+  dialogForm.description = agent.description || ''
+  dialogVisible.value = true
+}
+
+const handleSaveCustom = async () => {
+  if (!dialogForm.name.trim()) {
+    ElMessage.warning('请输入工具名称')
+    return
+  }
+  if (!dialogForm.agentId.trim()) {
+    ElMessage.warning('请输入工具代码')
+    return
+  }
+  if (!dialogForm.version.trim()) {
+    ElMessage.warning('请输入版本号')
+    return
+  }
+
+  dialogLoading.value = true
+  try {
+    if (editingAgent.value) {
+      // Update existing
+      const result = await updateCustom(editingAgent.value.customId || editingAgent.value.id, {
+        name: dialogForm.name.trim(),
+        version: dialogForm.version.trim(),
+        logoUrl: dialogForm.logoUrl.trim() || undefined,
+        description: dialogForm.description.trim() || undefined,
+      })
+      if (result) {
+        ElMessage.success('自定义工具已更新')
+        dialogVisible.value = false
+      }
+    } else {
+      // Create new
+      const result = await createCustom({
+        agentId: dialogForm.agentId.trim(),
+        name: dialogForm.name.trim(),
+        version: dialogForm.version.trim(),
+        logoUrl: dialogForm.logoUrl.trim() || undefined,
+        description: dialogForm.description.trim() || undefined,
+      })
+      if (result) {
+        ElMessage.success('自定义工具已创建')
+        dialogVisible.value = false
+      }
+    }
+  } finally {
+    dialogLoading.value = false
+  }
+}
+
+const handleDeleteCustom = async (agent: any) => {
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除自定义工具 "${agent.name}" 吗？`,
+      '删除确认',
+      {
+        confirmButtonText: '删除',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    )
+    const success = await deleteCustom(agent.customId || agent.id)
+    if (success) {
+      ElMessage.success('自定义工具已删除')
+    }
+  } catch {
+    // User cancelled
+  }
+}
+
 onMounted(() => {
   loadData()
 })
@@ -265,6 +446,11 @@ onMounted(() => {
   gap: 3px;
 }
 
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
 .section-title {
   font-size: 20px;
   font-weight: 700;
@@ -276,6 +462,21 @@ onMounted(() => {
   font-size: 13px;
   color: var(--agw-text-secondary);
   margin: 0;
+}
+
+.add-btn {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border: none;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);
+}
+
+.add-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
 }
 
 .refresh-btn {
@@ -318,6 +519,12 @@ onMounted(() => {
   font-size: 14px;
 }
 
+.empty-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
 /* Agents Grid */
 .agents-grid {
   display: grid;
@@ -339,6 +546,14 @@ onMounted(() => {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
+.agent-card.custom-agent {
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.agent-card.custom-agent:hover {
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
 .agent-header {
   display: flex;
   align-items: center;
@@ -355,6 +570,10 @@ onMounted(() => {
   background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
   border-radius: 12px;
   color: white;
+}
+
+.custom-agent .agent-icon {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
 }
 
 .logo-img {
@@ -382,10 +601,18 @@ onMounted(() => {
   color: var(--agw-text-secondary);
 }
 
+.custom-badge {
+  margin-left: auto;
+}
+
 .agent-desc {
   font-size: 13px;
   color: var(--agw-text-secondary);
   line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.agent-version {
   margin-bottom: 12px;
 }
 
@@ -421,6 +648,12 @@ onMounted(() => {
   align-items: center;
   gap: 4px;
   font-size: 13px;
+}
+
+.custom-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 /* Binding Section */
@@ -478,6 +711,17 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* Dialog */
+.dialog-form {
+  padding: 20px 0;
+}
+
+.form-tip {
+  font-size: 12px;
+  color: var(--agw-text-muted);
+  margin-top: 4px;
 }
 
 /* Divider */

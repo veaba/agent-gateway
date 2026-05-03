@@ -3,7 +3,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use super::model_types::*;
+pub use super::model_types::*;
 
 // ============================================================================
 // Provider 模板（内置，可远程更新）
@@ -283,6 +283,167 @@ impl Default for FallbackConfig {
             enabled: true,
             max_attempts: 3,
             priority_order: Vec::new(),
+        }
+    }
+}
+
+// ============================================================================
+// 自定义 Agent 工具
+// ============================================================================
+
+/// 自定义 Agent 工具
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CustomAgent {
+    /// UUID
+    pub id: String,
+    /// 用户填写的 code/标识符
+    pub agent_id: String,
+    /// 工具名称
+    pub name: String,
+    /// 版本号
+    pub version: String,
+    /// 图标 URL
+    pub logo_url: Option<String>,
+    /// 描述
+    pub description: Option<String>,
+    /// 创建时间
+    pub created_at: DateTime<Utc>,
+    /// 更新时间
+    pub updated_at: DateTime<Utc>,
+}
+
+impl CustomAgent {
+    /// 创建新的自定义 Agent
+    pub fn new(
+        id: String,
+        agent_id: String,
+        name: String,
+        version: String,
+    ) -> Self {
+        let now = Utc::now();
+        Self {
+            id,
+            agent_id,
+            name,
+            version,
+            logo_url: None,
+            description: None,
+            created_at: now,
+            updated_at: now,
+        }
+    }
+}
+
+/// 自定义 Agent 配置文件
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CustomAgentsConfig {
+    pub version: String,
+    pub custom_agents: Vec<CustomAgent>,
+}
+
+impl Default for CustomAgentsConfig {
+    fn default() -> Self {
+        Self {
+            version: "1.0".to_string(),
+            custom_agents: Vec::new(),
+        }
+    }
+}
+
+// ============================================================================
+// 自定义 Provider
+// ============================================================================
+
+/// 自定义 Provider（用户添加的服务商）
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CustomProvider {
+    /// UUID
+    pub id: String,
+    /// 用户填写的 provider_id/标识符
+    pub provider_id: String,
+    /// 服务商名称
+    pub name: String,
+    /// 描述
+    pub description: Option<String>,
+    /// 图标 URL
+    pub logo_url: Option<String>,
+    /// 官网
+    pub homepage: Option<String>,
+    /// 文档 URL
+    pub docs_url: Option<String>,
+    /// 获取 API Key 的 URL
+    pub get_api_key_url: Option<String>,
+    /// API 格式
+    pub api_format: ApiFormat,
+    /// Base URL（API endpoint）
+    pub base_url: String,
+    /// 是否需要 API Key
+    pub requires_api_key: bool,
+    /// 模型列表
+    pub models: Vec<CustomModel>,
+    /// 创建时间
+    pub created_at: DateTime<Utc>,
+    /// 更新时间
+    pub updated_at: DateTime<Utc>,
+}
+
+impl CustomProvider {
+    /// 创建新的自定义 Provider
+    pub fn new(
+        id: String,
+        provider_id: String,
+        name: String,
+        api_format: ApiFormat,
+        base_url: String,
+        requires_api_key: bool,
+    ) -> Self {
+        let now = Utc::now();
+        Self {
+            id,
+            provider_id,
+            name,
+            description: None,
+            logo_url: None,
+            homepage: None,
+            docs_url: None,
+            get_api_key_url: None,
+            api_format,
+            base_url,
+            requires_api_key,
+            models: Vec::new(),
+            created_at: now,
+            updated_at: now,
+        }
+    }
+}
+
+/// 自定义模型（用于 CustomProvider）
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CustomModel {
+    /// 模型 ID
+    pub model_id: String,
+    /// 模型名称
+    pub name: String,
+    /// 描述
+    pub description: Option<String>,
+    /// 上下文长度
+    pub context_length: Option<u64>,
+    /// 能力标签
+    pub capabilities: Vec<String>,
+}
+
+/// 自定义 Provider 配置文件
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CustomProvidersConfig {
+    pub version: String,
+    pub custom_providers: Vec<CustomProvider>,
+}
+
+impl Default for CustomProvidersConfig {
+    fn default() -> Self {
+        Self {
+            version: "1.0".to_string(),
+            custom_providers: Vec::new(),
         }
     }
 }

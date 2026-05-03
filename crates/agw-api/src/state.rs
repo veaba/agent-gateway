@@ -4,7 +4,7 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 
 use agw_core::{
-    business::{PlanManager, ProviderEngine, QuotaTracker, HealthChecker},
+    business::{PlanManager, ProviderEngine, QuotaTracker, HealthChecker, CustomAgentManager, CustomProviderManager},
     model::FallbackConfig,
     plugin::{PluginRegistry, PluginLifecycle},
     storage::{ConfigStore, RequestLogStore, SqliteStore},
@@ -35,6 +35,10 @@ pub struct AppState {
     pub sqlite_store: Arc<SqliteStore>,
     /// 健康检查器
     pub health_checker: Arc<HealthChecker>,
+    /// 自定义 Agent 管理器
+    pub custom_agent_manager: Arc<CustomAgentManager>,
+    /// 自定义 Provider 管理器
+    pub custom_provider_manager: Arc<CustomProviderManager>,
     /// API 配置
     pub api_config: ApiConfig,
 }
@@ -113,6 +117,18 @@ impl AppState {
             Arc::clone(&plan_manager),
         ));
 
+        // 创建自定义 Agent 管理器
+        let custom_agent_manager = Arc::new(CustomAgentManager::new(Arc::clone(&config_store)));
+        if let Err(e) = custom_agent_manager.load_all().await {
+            tracing::warn!("Failed to load custom agents: {}", e);
+        }
+
+        // 创建自定义 Provider 管理器
+        let custom_provider_manager = Arc::new(CustomProviderManager::new(Arc::clone(&config_store)));
+        if let Err(e) = custom_provider_manager.load_all().await {
+            tracing::warn!("Failed to load custom providers: {}", e);
+        }
+
         // 加载 API 配置
         let api_config = Self::load_api_config(&config_store).await;
 
@@ -128,6 +144,8 @@ impl AppState {
             log_store,
             sqlite_store,
             health_checker,
+            custom_agent_manager,
+            custom_provider_manager,
             api_config,
         })
     }
@@ -228,6 +246,18 @@ impl AppState {
             Arc::clone(&plan_manager),
         ));
 
+        // 创建自定义 Agent 管理器
+        let custom_agent_manager = Arc::new(CustomAgentManager::new(Arc::clone(&config_store)));
+        if let Err(e) = custom_agent_manager.load_all().await {
+            tracing::warn!("Failed to load custom agents: {}", e);
+        }
+
+        // 创建自定义 Provider 管理器
+        let custom_provider_manager = Arc::new(CustomProviderManager::new(Arc::clone(&config_store)));
+        if let Err(e) = custom_provider_manager.load_all().await {
+            tracing::warn!("Failed to load custom providers: {}", e);
+        }
+
         // 加载 API 配置
         let api_config = Self::load_api_config(&config_store).await;
 
@@ -242,6 +272,8 @@ impl AppState {
             log_store,
             sqlite_store,
             health_checker,
+            custom_agent_manager,
+            custom_provider_manager,
             api_config,
         })
     }

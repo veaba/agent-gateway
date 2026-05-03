@@ -4,46 +4,46 @@ export interface Provider {
   providerId: string
   name: string
   description: string
-  logo_url?: string
+  logoUrl?: string
   homepage: string
-  docs_url: string
-  get_api_key_url?: string
-  setup_guide_url?: string
-  api_format: 'anthropic' | 'openai' | 'custom'
-  requires_api_key: boolean
+  docsUrl: string
+  getApiKeyUrl?: string
+  setupGuideUrl?: string
+  apiFormat: 'anthropic' | 'openai' | 'custom' | string
+  requiresApiKey: boolean
   onboarding?: ProviderOnboarding
-  coding_plans?: CodingPlan[]
+  codingPlans?: CodingPlan[]
   models?: Model[]
-  supported_agents?: AgentRef[]
+  supportedAgents?: AgentRef[]
 }
 
 export interface CodingPlan {
-  plan_id: string
+  planId: string
   name: string
   description: string
-  tier: 'free' | 'pro' | 'enterprise' | 'custom'
-  supported_model_ids?: string[]
-  supported_agent_ids?: string[]
-  default_model_id?: string
-  default_agent_id?: string
-  quota_daily?: number
-  quota_monthly?: number
-  rpm_limit?: number
+  tier: 'free' | 'pro' | 'enterprise' | 'custom' | string
+  supportedModelIds?: string[]
+  supportedAgentIds?: string[]
+  defaultModelId?: string
+  defaultAgentId?: string
+  quotaDaily?: number
+  quotaMonthly?: number
+  rpmLimit?: number
   price?: string
   features?: string[]
 }
 
 export interface Model {
-  model_id: string
+  modelId: string
   name: string
   description?: string
-  context_length?: number
+  contextLength?: number
   capabilities: string[]
   providerId: string
 }
 
 export interface AgentRef {
-  agent_id: string
+  agentId: string
   name: string
 }
 
@@ -69,29 +69,29 @@ export interface UserPlan {
   providerId: string
   planId: string
   name: string
-  api_key_masked?: string  // From backend (masked)
-  selected_model_id: string
-  bound_agents: AgentBinding[]
+  apiKeyMasked?: string  // From backend (masked)
+  selectedModelId: string
+  boundAgents: AgentBinding[]
   enabled: boolean
   priority: number
-  custom_quota_daily?: number
-  custom_quota_monthly?: number
-  custom_rpm_limit?: number
-  alert_threshold?: number
+  customQuotaDaily?: number
+  customQuotaMonthly?: number
+  customRpmLimit?: number
+  alertThreshold?: number
   notes?: string
-  created_at: string
-  last_health_check?: string
-  health_status: 'unknown' | 'healthy' | 'warning' | 'error' | 'disabled'
-  quota_used?: number
-  quota_limit?: number
+  createdAt: string
+  lastHealthCheck?: string
+  healthStatus: 'unknown' | 'healthy' | 'warning' | 'error' | 'disabled'
+  quotaUsed?: number
+  quotaLimit?: number
 }
 
 export interface AgentBinding {
-  agent_id: string
+  agentId: string
   configured: boolean
-  config_status: 'not_configured' | 'auto_configured' | 'manually_configured' | 'config_error' | 'needs_update'
-  last_connected?: string
-  error_message?: string
+  configStatus: 'not_configured' | 'auto_configured' | 'manually_configured' | 'config_error' | 'needs_update'
+  lastConnected?: string
+  errorMessage?: string
 }
 
 export interface FallbackConfig {
@@ -299,4 +299,46 @@ export interface ProviderPerformance {
   estimatedRecoveryTimeMs?: number
   lastFallbackAt?: string
   healthScore: number
+}
+
+// ── Custom Agent Types ──
+
+export interface CustomAgent {
+  id: string
+  agentId: string      // code/identifier
+  name: string
+  version: string
+  logoUrl?: string
+  description?: string
+  createdAt: string
+  updatedAt: string
+  isCustom: boolean
+}
+
+// ── Custom Provider Types ──
+
+export interface CustomProvider {
+  id: string
+  providerId: string      // code/identifier
+  name: string
+  description?: string
+  logoUrl?: string
+  homepage?: string
+  docsUrl?: string
+  getApiKeyUrl?: string
+  apiFormat: 'anthropic' | 'openai' | 'custom' | string
+  baseUrl: string
+  requiresApiKey: boolean
+  models: CustomModel[]
+  createdAt: string
+  updatedAt: string
+  isCustom: boolean
+}
+
+export interface CustomModel {
+  modelId: string
+  name: string
+  description?: string
+  contextLength?: number
+  capabilities: string[]
 }

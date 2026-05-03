@@ -10,6 +10,8 @@ pub mod agent;
 pub mod stats;
 pub mod apikey;
 pub mod config;
+pub mod custom_agent;
+pub mod custom_provider;
 
 pub use api::*;
 pub use plan::*;
@@ -21,3 +23,5 @@ pub use agent::*;
 pub use stats::*;
 pub use apikey::*;
 pub use config::*;
+pub use custom_agent::*;
+pub use custom_provider::*;

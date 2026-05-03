@@ -64,12 +64,27 @@
             </el-icon>
             <span>配置引导</span>
           </el-menu-item>
-          <el-menu-item index="/settings">
-            <el-icon>
-              <Setting />
-            </el-icon>
-            <span>设置</span>
-          </el-menu-item>
+          <el-sum-menu index=''>
+            <template #title>
+              <el-icon>
+                <location />
+              </el-icon>
+              <span>Navigator One</span>
+            </template>
+          </el-sum-menu>
+          <el-sub-menu index="1">
+            <template #title>
+              <el-icon>
+                <Setting />
+              </el-icon>
+              <span>设置</span>
+            </template>
+            <el-menu-item-group>
+              <el-menu-item index="/settings">通用配置</el-menu-item>
+              <el-menu-item index="/settings/agents">Agents</el-menu-item>
+              <el-menu-item index="/settings/providers">Providers</el-menu-item>
+            </el-menu-item-group>
+          </el-sub-menu>
         </el-menu>
 
         <div class="sidebar-footer">

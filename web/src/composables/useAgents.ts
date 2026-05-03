@@ -1,9 +1,20 @@
 import { ref } from 'vue'
-import type { Agent, UserPlan } from '@/types'
-import { fetchAgents, bindAgent, unbindAgent, autoConfigAgent, fetchPlans } from '@/api'
+import type { Agent, UserPlan, CustomAgent } from '@/types'
+import {
+  fetchAgents,
+  bindAgent,
+  unbindAgent,
+  autoConfigAgent,
+  fetchPlans,
+  fetchCustomAgents,
+  createCustomAgent,
+  updateCustomAgent,
+  deleteCustomAgent
+} from '@/api'
 
 export function useAgents() {
   const agents = ref<Agent[]>([])
+  const customAgents = ref<CustomAgent[]>([])
   const plans = ref<UserPlan[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
@@ -17,6 +28,14 @@ export function useAgents() {
       error.value = '加载 Agent 工具失败'
     } finally {
       isLoading.value = false
+    }
+  }
+
+  const loadCustomAgents = async () => {
+    try {
+      customAgents.value = await fetchCustomAgents()
+    } catch {
+      error.value = '加载自定义 Agent 失败'
     }
   }
 
@@ -61,6 +80,40 @@ export function useAgents() {
     }
   }
 
+  // Custom Agent CRUD
+  const createCustom = async (agent: Partial<CustomAgent>) => {
+    try {
+      const newAgent = await createCustomAgent(agent)
+      await loadCustomAgents()
+      return newAgent
+    } catch {
+      error.value = '创建自定义 Agent 失败'
+      return null
+    }
+  }
+
+  const updateCustom = async (id: string, updates: Partial<CustomAgent>) => {
+    try {
+      const updated = await updateCustomAgent(id, updates)
+      await loadCustomAgents()
+      return updated
+    } catch {
+      error.value = '更新自定义 Agent 失败'
+      return null
+    }
+  }
+
+  const deleteCustom = async (id: string) => {
+    try {
+      await deleteCustomAgent(id)
+      await loadCustomAgents()
+      return true
+    } catch {
+      error.value = '删除自定义 Agent 失败'
+      return false
+    }
+  }
+
   // Get binding info for a specific agent from a plan
   const getAgentBinding = (planId: string, agentId: string) => {
     const plan = plans.value.find(p => p.id === planId)
@@ -74,17 +127,41 @@ export function useAgents() {
     )
   }
 
+  // Get combined list of all agents (built-in + custom)
+  const getAllAgents = () => {
+    const customAsAgents: Agent[] = customAgents.value.map(ca => ({
+      agent_id: ca.agentId,
+      name: ca.name,
+      description: ca.description,
+      logo_url: ca.logoUrl,
+      homepage: '',
+      install_url: '',
+      supported_formats: [],
+      config_methods: [],
+      isCustom: true,
+      version: ca.version,
+      customId: ca.id,
+    } as any))
+    return [...agents.value, ...customAsAgents]
+  }
+
   return {
     agents,
+    customAgents,
     plans,
     isLoading,
     error,
     loadAgents,
+    loadCustomAgents,
     loadPlans,
     bind,
     unbind,
     autoConfig,
+    createCustom,
+    updateCustom,
+    deleteCustom,
     getAgentBinding,
-    getPlansWithAgent
+    getPlansWithAgent,
+    getAllAgents,
   }
 }
