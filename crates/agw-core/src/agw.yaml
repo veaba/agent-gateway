@@ -1,0 +1,327 @@
+# agent-gateway 核心配置
+# 内置 Provider 模板定义
+
+# agent 工具
+agent-tools:
+  claude-code:
+    tool_id: claude-code
+    name: Claude Code
+    description: Anthropic 官方的代码生成工具，支持多种编程语言和框架，适合开发者使用。
+    homepage: https://docs.anthropic.com/claude-code
+    setup_guide_url: https://docs.anthropic.com/claude-code/setup
+    logo_url: null
+  kimi-cli:
+    tool_id: kimi-cli
+    name: Kimi CLI
+    description: Kimi CLI 是一个开源的命令行工具，支持多种 LLM API，适合喜欢使用终端的开发者。
+    homepage: https://kimi.ai
+    setup_guide_url: https://kimi.ai/docs
+    logo_url: null
+  opencode:
+    tool_id: opencode
+    name: OpenCode
+    description: OpenCode 是一个社区驱动的代码生成工具，支持多种模型和插件，适合喜欢定制化的开发者。
+    homepage: https://opencode.ai
+    setup_guide_url: https://opencode.ai/docs
+    logo_url: null
+
+core:
+  # 内置 Provider 模板列表
+  providers:
+    # Alaya Provider
+    - provider_id: alaya
+      name: Alaya
+      description: Alaya AI Coding Platform
+      logo_url: null
+      homepage: https://alaya.ai
+      docs_url: https://docs.alaya.ai
+      get_api_key_url: https://console.alaya.ai/settings/api-keys
+      setup_guide_url: https://docs.alaya.ai/getting-started
+      api_format: anthropic
+      base_url_template: https://api.alaya.com/coding/{plan_id}
+      base_url: null
+      requires_api_key: true
+      version: "0.1.0"
+      onboarding:
+        description: Alaya 是中国团队开发的AI编程平台
+        signup_url: https://alaya.ai/signup
+        plans_comparison_url: https://alaya.ai/pricing
+        get_key_url: https://console.alaya.ai/settings/api-keys
+        setup_guide_url: https://docs.alaya.ai/getting-started
+        faq_url: null
+        agent_setup_guides:
+          - agent_id: claude-code
+            agent_name: Claude Code
+            auto_config_supported: true
+            auto_config_script: |
+              # Set environment variables for Claude Code
+              export ANTHROPIC_BASE_URL=http://127.0.0.1:8080
+              export ANTHROPIC_API_KEY=dummy
+            manual_steps:
+              - step_number: 1
+                description: 设置环境变量
+                command: export ANTHROPIC_BASE_URL=http://127.0.0.1:8080
+                copyable_text: export ANTHROPIC_BASE_URL=http://127.0.0.1:8080
+                note: 将此行添加到 ~/.zshrc 或 ~/.bashrc 以持久化
+              - step_number: 2
+                description: 设置 API Key（任意值，网关会替换为实际Key）
+                command: export ANTHROPIC_API_KEY=dummy
+                copyable_text: export ANTHROPIC_API_KEY=dummy
+                note: 网关会自动使用您配置的实际 API Key
+              - step_number: 3
+                description: 启动 Claude Code
+                command: claude
+                copyable_text: null
+                note: null
+            config_file_paths:
+              macos: ~/Library/Application Support/Claude/settings.json
+              linux: ~/.config/claude/settings.json
+              windows: "%APPDATA%\\Claude\\settings.json"
+            env_vars:
+              - name: ANTHROPIC_BASE_URL
+                value: http://127.0.0.1:8080
+                description: Claude Code 网关地址
+              - name: ANTHROPIC_API_KEY
+                value: dummy
+                description: 任意值，网关会替换为实际Key
+          - agent_id: kimi-cli
+            agent_name: Kimi CLI
+            auto_config_supported: true
+            auto_config_script: |
+              # Create Kimi CLI config directory
+              mkdir -p ~/.config/kimi
+              cat > ~/.config/kimi/config.yaml << 'EOF'
+              api: anthropic-messages
+              baseUrl: http://127.0.0.1:8080/v1
+              apiKey: dummy
+              EOF
+            manual_steps:
+              - step_number: 1
+                description: 创建配置目录
+                command: mkdir -p ~/.config/kimi
+                copyable_text: null
+                note: null
+              - step_number: 2
+                description: 创建配置文件
+                command: null
+                copyable_text: |
+                  api: anthropic-messages
+                  baseUrl: http://127.0.0.1:8080/v1
+                  apiKey: dummy
+                note: 保存为 ~/.config/kimi/config.yaml
+              - step_number: 3
+                description: 启动 Kimi CLI
+                command: kimi
+                copyable_text: null
+                note: null
+            config_file_paths:
+              macos: ~/.config/kimi/config.yaml
+              linux: ~/.config/kimi/config.yaml
+              windows: "%APPDATA%\\kimi\\config.yaml"
+            env_vars:
+              - name: KIMI_BASE_URL
+                value: http://127.0.0.1:8080/v1
+                description: Kimi CLI 网关地址
+      coding_plans:
+        - plan_id: alaya-lite
+          # TODO debug
+          name: CodingPlan Lite（基础版）
+          description: 轻量版，适合个人日常开发
+          tier: free
+          supported_model_ids:
+            - minimax-2.5
+          supported_agent_ids:
+            - claude-code
+          default_model_id: minimax-2.5
+          default_agent_id: claude-code
+          quota_daily: 100
+          quota_monthly: 2000
+          rpm_limit: 20
+          price: 免费
+          features:
+            - 基础代码生成
+        - plan_id: alaya-plus
+          name: Plus
+          description: 进阶版，适合专业开发者
+          tier: pro
+          supported_model_ids:
+            - minimax-2.5
+            - glm-5
+          supported_agent_ids:
+            - claude-code
+            - kimi-cli
+          default_model_id: glm-5
+          default_agent_id: claude-code
+          quota_daily: 500
+          quota_monthly: 10000
+          rpm_limit: 60
+          price: ¥29/月
+          features:
+            - 多模型切换
+            - 专业开发
+        - plan_id: alaya-max
+          name: Max
+          description: 旗舰版，适合团队和高频使用
+          tier: enterprise
+          supported_model_ids:
+            - minimax-2.5
+            - glm-5
+            - deepseek-v4-pro
+          supported_agent_ids:
+            - claude-code
+            - kimi-cli
+            - opencode
+            - kilo-cli
+          default_model_id: deepseek-v4-pro
+          default_agent_id: claude-code
+          quota_daily: 2000
+          quota_monthly: 50000
+          rpm_limit: 200
+          price: ¥99/月
+          features:
+            - 全模型
+            - 全工具
+      models:
+        - model_id: minimax-2.5
+          name: MiniMax-2.5
+          description: null
+          context_length: 256000
+          capabilities:
+            - code
+            - reasoning
+          provider_id: alaya
+        - model_id: glm-5
+          name: GLM-5
+          description: null
+          context_length: 128000
+          capabilities:
+            - code
+            - reasoning
+            - chinese_optimized
+          provider_id: alaya
+        - model_id: deepseek-v4-pro
+          name: DeepSeek-V4-Pro
+          description: null
+          context_length: 128000
+          capabilities:
+            - code
+            - reasoning
+            - math
+          provider_id: alaya
+      supported_agents:
+        - agent_id: claude-code
+          name: Claude Code
+        - agent_id: kimi-cli
+          name: Kimi CLI
+        - agent_id: opencode
+          name: OpenCode
+        - agent_id: kilo-cli
+          name: Kilo CLI
+
+    # Anthropic Provider
+    - provider_id: anthropic
+      name: Anthropic
+      description: Claude API 官方直连
+      logo_url: null
+      homepage: https://anthropic.com
+      docs_url: https://docs.anthropic.com
+      get_api_key_url: https://console.anthropic.com/settings/keys
+      setup_guide_url: https://docs.anthropic.com/claude-code/setup
+      api_format: anthropic
+      base_url: https://api.anthropic.com
+      base_url_template: null
+      requires_api_key: true
+      version: "0.1.0"
+      onboarding:
+        description: Anthropic 官方 Claude API
+        signup_url: https://console.anthropic.com
+        plans_comparison_url: null
+        get_key_url: https://console.anthropic.com/settings/keys
+        setup_guide_url: https://docs.anthropic.com/claude-code/setup
+        faq_url: null
+        agent_setup_guides:
+          - agent_id: claude-code
+            agent_name: Claude Code
+            auto_config_supported: true
+            auto_config_script: |
+              # Set environment variables for Claude Code
+              export ANTHROPIC_BASE_URL=http://127.0.0.1:8080
+              export ANTHROPIC_API_KEY=dummy
+            manual_steps:
+              - step_number: 1
+                description: 设置 Anthropic 基础URL
+                command: export ANTHROPIC_BASE_URL=http://127.0.0.1:8080
+                copyable_text: export ANTHROPIC_BASE_URL=http://127.0.0.1:8080
+                note: 将此行添加到 shell 配置文件以持久化
+              - step_number: 2
+                description: 设置 API Key（网关会替换为实际Key）
+                command: export ANTHROPIC_API_KEY=dummy
+                copyable_text: export ANTHROPIC_API_KEY=dummy
+                note: 网关会自动使用您配置的实际 API Key
+              - step_number: 3
+                description: 配置文件方式（可选）
+                command: null
+                copyable_text: |
+                  {
+                    "anthropicBaseUrl": "http://127.0.0.1:8080"
+                  }
+                note: 保存为 Claude 配置目录下的 settings.json
+              - step_number: 4
+                description: 启动 Claude Code
+                command: claude
+                copyable_text: null
+                note: null
+            config_file_paths:
+              macos: ~/Library/Application Support/Claude/settings.json
+              linux: ~/.config/claude/settings.json
+              windows: "%APPDATA%\\Claude\\settings.json"
+            env_vars:
+              - name: ANTHROPIC_BASE_URL
+                value: http://127.0.0.1:8080
+                description: 网关代理地址
+              - name: ANTHROPIC_API_KEY
+                value: dummy
+                description: 占位Key，网关会替换为实际Key
+      coding_plans:
+        - plan_id: anthropic-default
+          name: Anthropic API
+          description: Anthropic官方API直连
+          tier: custom
+          supported_model_ids:
+            - claude-sonnet-4-5
+            - claude-opus-4
+          supported_agent_ids:
+            - claude-code
+          default_model_id: claude-sonnet-4-5
+          default_agent_id: claude-code
+          quota_daily: null
+          quota_monthly: null
+          rpm_limit: null
+          price: null
+          features:
+            - 官方直连
+      models:
+        - model_id: claude-sonnet-4-5
+          name: Claude Sonnet 4.5
+          description: null
+          context_length: 200000
+          capabilities:
+            - code
+            - reasoning
+          provider_id: anthropic
+        - model_id: claude-opus-4
+          name: Claude Opus 4
+          description: null
+          context_length: 200000
+          capabilities:
+            - code
+            - reasoning
+          provider_id: anthropic
+      supported_agents:
+        - agent_id: claude-code
+          name: Claude Code
+
+  # Registry 更新配置
+  registry:
+    url: https://registry.agent-gateway.dev
+    local_version: "0.1.0"

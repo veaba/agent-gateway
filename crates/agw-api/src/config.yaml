@@ -1,0 +1,9 @@
+health:
+  # 正常检查间隔（秒），用于健康的 plan
+  interval_secs: 300
+
+  # 恢复检查间隔（秒），用于快速检测 Error 状态的 plan 恢复
+  recovery_interval_secs: 60
+
+plans:
+  

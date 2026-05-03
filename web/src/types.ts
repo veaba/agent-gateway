@@ -47,6 +47,18 @@ export interface AgentRef {
   name: string
 }
 
+// Full Agent definition
+export interface Agent {
+  agent_id: string
+  name: string
+  description?: string
+  logo_url?: string
+  homepage?: string
+  install_url?: string
+  supported_formats: string[]
+  config_methods: string[]
+}
+
 export interface PlanQuota {
   quota_used: number
   quota_limit: number

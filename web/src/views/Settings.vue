@@ -1,150 +1,161 @@
 <template>
-  <div class="settings-view">
-    <el-card class="settings-card">
-      <template #header>
-        <div class="card-header">
-          <span class="card-title">网关服务</span>
-          <el-tag :type="gatewayRunning ? 'success' : 'danger'" size="small" round>
-            {{ gatewayRunning ? '运行中' : '已停止' }}
-          </el-tag>
+
+
+  <el-container>
+    <el-container class="settings-container">
+      <div class='settings-gateway-base'>
+        <el-card class=" settings-card">
+          <template #header>
+            <div class="card-header">
+              <span class="card-title">网关服务</span>
+              <el-tag :type="gatewayRunning ? 'success' : 'danger'" size="small" round>
+                {{ gatewayRunning ? '运行中' : '已停止' }}
+              </el-tag>
+            </div>
+          </template>
+
+          <el-form label-position="top" class="settings-form">
+            <el-form-item label="监听地址">
+              <el-input v-model="gatewaySettings.listenAddress" placeholder="127.0.0.1:8080" clearable
+                :disabled="gatewayRunning">
+                <template #prefix>
+                  <el-icon>
+                    <Monitor />
+                  </el-icon>
+                </template>
+              </el-input>
+              <div class="form-tip">网关服务监听地址，修改后需重启生效</div>
+            </el-form-item>
+
+            <el-form-item>
+              <el-button v-if="!gatewayRunning" type="primary" :loading="gatewayLoading" @click="handleStartGateway">
+                <el-icon>
+                  <VideoPlay />
+                </el-icon>
+                启动网关
+              </el-button>
+              <el-button v-else type="danger" :loading="gatewayLoading" @click="handleStopGateway">
+                <el-icon>
+                  <VideoPause />
+                </el-icon>
+                停止网关
+              </el-button>
+            </el-form-item>
+          </el-form>
+        </el-card>
+
+        <el-card class=" settings-card">
+          <template #header>
+            <div class="card-header">
+              <span class="card-title">基本设置</span>
+            </div>
+          </template>
+
+          <el-form label-position="top" class="settings-form">
+            <el-form-item label="日志级别">
+              <el-select v-model="settings.logLevel" placeholder="选择日志级别" style="width: 100%">
+                <el-option label="Debug" value="debug" />
+                <el-option label="Info" value="info" />
+                <el-option label="Warning" value="warn" />
+                <el-option label="Error" value="error" />
+              </el-select>
+            </el-form-item>
+
+            <el-form-item label="主题模式">
+              <el-select v-model="settings.theme" placeholder="选择主题" style="width: 100%">
+                <el-option label="深色 (Dark)" value="dark" />
+                <el-option label="浅色 (Light)" value="light" />
+                <el-option label="跟随系统" value="auto" />
+              </el-select>
+            </el-form-item>
+
+            <el-divider />
+
+            <el-form-item>
+              <el-button type="primary" :loading="saving" @click="handleSave">
+                <el-icon>
+                  <Check />
+                </el-icon>
+                保存设置
+              </el-button>
+              <el-button @click="loadSettings">
+                <el-icon>
+                  <Refresh />
+                </el-icon>
+                重置
+              </el-button>
+            </el-form-item>
+          </el-form>
+        </el-card>
+      </div>
+      <div class="settings-view">
+      </div>
+
+    </el-container>
+    <el-aside class='setting-aside'>
+      <el-card class="settings-card">
+        <template #header>
+          <div class="card-header">
+            <span class="card-title">关于</span>
+          </div>
+        </template>
+
+        <div class="about-grid">
+          <div class="about-item">
+            <span class="about-label">版本</span>
+            <span class="about-value agw-mono">0.1.0</span>
+          </div>
+          <div class="about-item">
+            <span class="about-label">构建时间</span>
+            <span class="about-value">{{ buildTime }}</span>
+          </div>
+          <div class="about-item">
+            <span class="about-label">前端框架</span>
+            <span class="about-value">Vue 3 + Element Plus</span>
+          </div>
+          <div class="about-item">
+            <span class="about-label">后端框架</span>
+            <span class="about-value">Rust + Axum</span>
+          </div>
+          <div class="about-item">
+            <span class="about-label">服务状态</span>
+            <span class="about-value">
+              <el-tag :type="isConnected ? 'success' : 'danger'" size="small" round>
+                {{ isConnected ? '在线' : '离线' }}
+              </el-tag>
+            </span>
+          </div>
+          <div class="about-item">
+            <span class="about-label">API 端点</span>
+            <span class="about-value agw-mono">{{ gatewaySettings.listenAddress }}</span>
+          </div>
         </div>
-      </template>
-
-      <el-form label-position="top" class="settings-form">
-        <el-form-item label="监听地址">
-          <el-input v-model="gatewaySettings.listenAddress" placeholder="127.0.0.1:8080" clearable
-            :disabled="gatewayRunning">
-            <template #prefix>
-              <el-icon>
-                <Monitor />
-              </el-icon>
-            </template>
-          </el-input>
-          <div class="form-tip">网关服务监听地址，修改后需重启生效</div>
-        </el-form-item>
-
-        <el-form-item>
-          <el-button v-if="!gatewayRunning" type="primary" :loading="gatewayLoading" @click="handleStartGateway">
-            <el-icon>
-              <VideoPlay />
-            </el-icon>
-            启动网关
-          </el-button>
-          <el-button v-else type="danger" :loading="gatewayLoading" @click="handleStopGateway">
-            <el-icon>
-              <VideoPause />
-            </el-icon>
-            停止网关
-          </el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
-
-    <el-card class="settings-card">
-      <template #header>
-        <div class="card-header">
-          <span class="card-title">基本设置</span>
-        </div>
-      </template>
-
-      <el-form label-position="top" class="settings-form">
-        <el-form-item label="日志级别">
-          <el-select v-model="settings.logLevel" placeholder="选择日志级别" style="width: 100%">
-            <el-option label="Debug" value="debug" />
-            <el-option label="Info" value="info" />
-            <el-option label="Warning" value="warn" />
-            <el-option label="Error" value="error" />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="主题模式">
-          <el-select v-model="settings.theme" placeholder="选择主题" style="width: 100%">
-            <el-option label="深色 (Dark)" value="dark" />
-            <el-option label="浅色 (Light)" value="light" />
-            <el-option label="跟随系统" value="auto" />
-          </el-select>
-        </el-form-item>
 
         <el-divider />
 
-        <el-form-item>
-          <el-button type="primary" :loading="saving" @click="handleSave">
-            <el-icon>
-              <Check />
-            </el-icon>
-            保存设置
-          </el-button>
-          <el-button @click="loadSettings">
-            <el-icon>
-              <Refresh />
-            </el-icon>
-            重置
-          </el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
+        <div class="about-footer">
+          <p class="about-desc">
+            Agent Gateway 是一个统一的 AI 代理网关，支持多种 AI 服务提供商的套餐管理、自动故障转移和配额控制。
+          </p>
+          <div class="about-links">
+            <el-button link type="primary" @click="openUrl('https://github.com')">
+              <el-icon>
+                <Link />
+              </el-icon>
+              GitHub
+            </el-button>
+            <el-button link type="primary" @click="openUrl('https://docs.anthropic.com')">
+              <el-icon>
+                <Document />
+              </el-icon>
+              文档
+            </el-button>
+          </div>
+        </div>
+      </el-card>
+    </el-aside>
+  </el-container>
 
-    <el-card class="settings-card">
-      <template #header>
-        <div class="card-header">
-          <span class="card-title">关于</span>
-        </div>
-      </template>
-
-      <div class="about-grid">
-        <div class="about-item">
-          <span class="about-label">版本</span>
-          <span class="about-value agw-mono">0.1.0</span>
-        </div>
-        <div class="about-item">
-          <span class="about-label">构建时间</span>
-          <span class="about-value">{{ buildTime }}</span>
-        </div>
-        <div class="about-item">
-          <span class="about-label">前端框架</span>
-          <span class="about-value">Vue 3 + Element Plus</span>
-        </div>
-        <div class="about-item">
-          <span class="about-label">后端框架</span>
-          <span class="about-value">Rust + Axum</span>
-        </div>
-        <div class="about-item">
-          <span class="about-label">服务状态</span>
-          <span class="about-value">
-            <el-tag :type="isConnected ? 'success' : 'danger'" size="small" round>
-              {{ isConnected ? '在线' : '离线' }}
-            </el-tag>
-          </span>
-        </div>
-        <div class="about-item">
-          <span class="about-label">API 端点</span>
-          <span class="about-value agw-mono">{{ gatewaySettings.listenAddress }}</span>
-        </div>
-      </div>
-
-      <el-divider />
-
-      <div class="about-footer">
-        <p class="about-desc">
-          Agent Gateway 是一个统一的 AI 代理网关，支持多种 AI 服务提供商的套餐管理、自动故障转移和配额控制。
-        </p>
-        <div class="about-links">
-          <el-button link type="primary" @click="openUrl('https://github.com')">
-            <el-icon>
-              <Link />
-            </el-icon>
-            GitHub
-          </el-button>
-          <el-button link type="primary" @click="openUrl('https://docs.anthropic.com')">
-            <el-icon>
-              <Document />
-            </el-icon>
-            文档
-          </el-button>
-        </div>
-      </div>
-    </el-card>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -270,8 +281,31 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: 100%;
   max-width: 640px;
   animation: fadeIn 0.5s ease;
+}
+
+.settings-gateway-base {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  flex: 1;
+
+  .settings-card {
+    flex: 1;
+  }
+}
+
+.settings-container {
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
+  margin-right: 20px;
+}
+
+.setting-aside {
+  width: 400px;
 }
 
 @keyframes fadeIn {

@@ -7,6 +7,34 @@
 - **格式**: JSON
 - **认证**: 可选的 API Key
 
+## 服务器配置
+
+API 服务器可通过 `api.yaml` 配置文件自定义运行参数。
+
+### 配置文件位置
+
+| 平台 | 路径 |
+|------|------|
+| Windows | `%APPDATA%\agent-gateway\api.yaml` |
+| Linux | `~/.config/agent-gateway/api.yaml` |
+| macOS | `~/Library/Application Support/agent-gateway/api.yaml` |
+
+### 配置示例
+
+```yaml
+health:
+  # 正常检查间隔（秒），用于健康的 plan
+  interval_secs: 300
+
+  # 恢复检查间隔（秒），用于快速检测 Error 状态的 plan 恢复
+  recovery_interval_secs: 60
+```
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `health.interval_secs` | 300 | 健康检查间隔（秒） |
+| `health.recovery_interval_secs` | 60 | 恢复检查间隔（秒） |
+
 ## 认证
 
 ### 方式一：API Key 头

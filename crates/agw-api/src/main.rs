@@ -33,12 +33,17 @@ async fn main() -> Result<()> {
     tracing::info!("AppState initialized");
 
     // 启动后台健康监控任务
-    // 每 5 分钟检查一次健康的 plan
-    // 每 1 分钟检查一次处于 Error 状态的 plan（用于快速检测恢复）
+    // 从配置读取检查间隔
+    let health_config = &state.api_config.health;
+    tracing::info!(
+        "Starting health monitor with intervals: normal={}s, recovery={}s",
+        health_config.interval_secs,
+        health_config.recovery_interval_secs
+    );
     start_health_monitor(
         state.health_checker.clone(),
-        300,  // 5 分钟正常检查间隔
-        60,   // 1 分钟恢复检测间隔
+        health_config.interval_secs,
+        health_config.recovery_interval_secs,
     ).await;
 
     // CORS 配置

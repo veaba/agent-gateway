@@ -17,6 +17,56 @@ cargo build -p agw-api --release
 
 服务默认监听 `http://127.0.0.1:8081`
 
+## 配置
+
+API 服务器支持通过 YAML 配置文件自定义运行参数。
+
+### 配置文件位置
+
+配置文件 `api.yaml` 位于用户配置目录：
+
+| 平台 | 路径 |
+|------|------|
+| Windows | `%APPDATA%\agent-gateway\api.yaml` |
+| Linux | `~/.config/agent-gateway/api.yaml` |
+| macOS | `~/Library/Application Support/agent-gateway/api.yaml` |
+
+如果配置文件不存在，将使用内置默认值。
+
+### 配置项
+
+```yaml
+health:
+  # 正常检查间隔（秒），用于健康的 plan
+  interval_secs: 300
+
+  # 恢复检查间隔（秒），用于快速检测 Error 状态的 plan 恢复
+  recovery_interval_secs: 60
+```
+
+| 配置项 | 说明 | 默认值 |
+|--------|------|--------|
+| `health.interval_secs` | 健康检查间隔（秒） | 300 (5 分钟) |
+| `health.recovery_interval_secs` | 恢复检查间隔（秒） | 60 (1 分钟) |
+
+### 示例
+
+调整健康检查频率（更频繁的检查）：
+
+```yaml
+health:
+  interval_secs: 120    # 2 分钟检查一次
+  recovery_interval_secs: 30  # 30 秒检测恢复
+```
+
+降低检查频率（节省资源）：
+
+```yaml
+health:
+  interval_secs: 600    # 10 分钟检查一次
+  recovery_interval_secs: 120  # 2 分钟检测恢复
+```
+
 ## 健康检查
 
 ```bash

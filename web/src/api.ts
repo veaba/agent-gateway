@@ -13,6 +13,7 @@ import type {
   FallbackEvent,
   FallbackStats,
   ProviderPerformance,
+  Agent,
 } from "./types";
 
 const api = axios.create({
@@ -106,6 +107,24 @@ export async function enablePlugin(id: string): Promise<void> {
 
 export async function disablePlugin(id: string): Promise<void> {
   await api.post(`/plugins/${id}/disable`);
+}
+
+// Agent APIs
+export async function fetchAgents(): Promise<Agent[]> {
+  const { data } = await api.get("/agents");
+  return data.data.agents;
+}
+
+export async function bindAgent(planId: string, agentId: string, autoConfig: boolean = false): Promise<void> {
+  await api.post(`/plans/${planId}/agents/${agentId}/bind`, { auto_config: autoConfig });
+}
+
+export async function unbindAgent(planId: string, agentId: string): Promise<void> {
+  await api.delete(`/plans/${planId}/agents/${agentId}/unbind`);
+}
+
+export async function autoConfigAgent(planId: string, agentId: string): Promise<void> {
+  await api.post(`/plans/${planId}/agents/${agentId}/auto-config`);
 }
 
 // Stats APIs

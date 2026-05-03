@@ -7,6 +7,26 @@ use anyhow::Result;
 
 use crate::model::{ProviderTemplate, CodingPlanTemplate};
 
+/// 内置 YAML 配置结构
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CoreConfig {
+    pub providers: Vec<ProviderTemplate>,
+    pub registry: RegistryConfig,
+}
+
+/// Registry 配置
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RegistryConfig {
+    pub url: String,
+    pub local_version: String,
+}
+
+/// YAML 配置根结构
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgwConfig {
+    pub core: CoreConfig,
+}
+
 /// 远程 Registry 索引
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RegistryIndex {
@@ -52,21 +72,37 @@ pub struct ProviderEngine {
     local_version: String,
 }
 
+/// 内置配置 YAML 内容（嵌入编译时）
+const BUILTIN_CONFIG_YAML: &str = include_str!("../agw.yaml");
+
 impl ProviderEngine {
     /// 创建新的 Provider 引擎
     pub fn new() -> Self {
-        Self::with_registry("https://registry.agent-gateway.dev")
+        // 从嵌入的 YAML 解析配置
+        let config: AgwConfig = serde_yaml::from_str(BUILTIN_CONFIG_YAML)
+            .expect("Failed to parse builtin agw.yaml");
+
+        Self::with_registry_and_version(&config.core.registry.url, &config.core.registry.local_version, config.core.providers)
     }
 
     /// 使用自定义 registry URL 创建
     pub fn with_registry(registry_url: &str) -> Self {
+        // 从嵌入的 YAML 解析配置
+        let config: AgwConfig = serde_yaml::from_str(BUILTIN_CONFIG_YAML)
+            .expect("Failed to parse builtin agw.yaml");
+
+        Self::with_registry_and_version(registry_url, &config.core.registry.local_version, config.core.providers)
+    }
+
+    /// 使用完整配置创建
+    fn with_registry_and_version(registry_url: &str, local_version: &str, providers: Vec<ProviderTemplate>) -> Self {
         let engine = Self {
             builtin: Arc::new(DashMap::new()),
             custom: Arc::new(DashMap::new()),
             registry_url: registry_url.to_string(),
-            local_version: "0.1.0".to_string(),
+            local_version: local_version.to_string(),
         };
-        engine.load_builtin_providers();
+        engine.load_providers_from_config(providers);
         engine
     }
 
@@ -111,320 +147,14 @@ impl ProviderEngine {
         provider.models.into_iter().find(|m| m.model_id == model_id)
     }
 
-    /// 加载内置 Provider 模板
-    fn load_builtin_providers(&self) {
-        // Alaya Provider
-        self.builtin.insert("alaya".to_string(), crate::model::ProviderTemplate {
-            provider_id: "alaya".to_string(),
-            name: "Alaya".to_string(),
-            description: "Alaya AI Coding Platform".to_string(),
-            logo_url: None,
-            homepage: "https://alaya.ai".to_string(),
-            docs_url: "https://docs.alaya.ai".to_string(),
-            get_api_key_url: Some("https://console.alaya.ai/settings/api-keys".to_string()),
-            setup_guide_url: Some("https://docs.alaya.ai/getting-started".to_string()),
-            api_format: crate::model_types::ApiFormat::Anthropic,
-            base_url_template: Some("https://api.alaya.com/coding/{plan_id}".to_string()),
-            base_url: None,
-            requires_api_key: true,
-            onboarding: crate::model::ProviderOnboarding {
-                description: "Alaya 是中国团队开发的AI编程平台".to_string(),
-                signup_url: "https://alaya.ai/signup".to_string(),
-                plans_comparison_url: Some("https://alaya.ai/pricing".to_string()),
-                get_key_url: Some("https://console.alaya.ai/settings/api-keys".to_string()),
-                setup_guide_url: Some("https://docs.alaya.ai/getting-started".to_string()),
-                faq_url: None,
-                agent_setup_guides: vec![
-                    crate::model::AgentSetupGuide {
-                        agent_id: "claude-code".to_string(),
-                        agent_name: "Claude Code".to_string(),
-                        auto_config_supported: true,
-                        auto_config_script: Some("# Set environment variables for Claude Code\nexport ANTHROPIC_BASE_URL=http://127.0.0.1:8080\nexport ANTHROPIC_API_KEY=dummy".to_string()),
-                        manual_steps: vec![
-                            crate::model::SetupStep {
-                                step_number: 1,
-                                description: "设置环境变量".to_string(),
-                                command: Some("export ANTHROPIC_BASE_URL=http://127.0.0.1:8080".to_string()),
-                                copyable_text: Some("export ANTHROPIC_BASE_URL=http://127.0.0.1:8080".to_string()),
-                                note: Some("将此行添加到 ~/.zshrc 或 ~/.bashrc 以持久化".to_string()),
-                            },
-                            crate::model::SetupStep {
-                                step_number: 2,
-                                description: "设置 API Key（任意值，网关会替换为实际Key）".to_string(),
-                                command: Some("export ANTHROPIC_API_KEY=dummy".to_string()),
-                                copyable_text: Some("export ANTHROPIC_API_KEY=dummy".to_string()),
-                                note: Some("网关会自动使用您配置的实际 API Key".to_string()),
-                            },
-                            crate::model::SetupStep {
-                                step_number: 3,
-                                description: "启动 Claude Code".to_string(),
-                                command: Some("claude".to_string()),
-                                copyable_text: None,
-                                note: None,
-                            },
-                        ],
-                        config_file_paths: crate::model::PlatformPaths {
-                            macos: Some("~/Library/Application Support/Claude/settings.json".to_string()),
-                            linux: Some("~/.config/claude/settings.json".to_string()),
-                            windows: Some("%APPDATA%\\Claude\\settings.json".to_string()),
-                        },
-                        env_vars: vec![
-                            crate::model::EnvVarConfig {
-                                name: "ANTHROPIC_BASE_URL".to_string(),
-                                value: "http://127.0.0.1:8080".to_string(),
-                                description: "Claude Code 网关地址".to_string(),
-                            },
-                            crate::model::EnvVarConfig {
-                                name: "ANTHROPIC_API_KEY".to_string(),
-                                value: "dummy".to_string(),
-                                description: "任意值，网关会替换为实际Key".to_string(),
-                            },
-                        ],
-                    },
-                    crate::model::AgentSetupGuide {
-                        agent_id: "kimi-cli".to_string(),
-                        agent_name: "Kimi CLI".to_string(),
-                        auto_config_supported: true,
-                        auto_config_script: Some("# Create Kimi CLI config directory\nmkdir -p ~/.config/kimi\ncat > ~/.config/kimi/config.yaml << 'EOF'\napi: anthropic-messages\nbaseUrl: http://127.0.0.1:8080/v1\napiKey: dummy\nEOF".to_string()),
-                        manual_steps: vec![
-                            crate::model::SetupStep {
-                                step_number: 1,
-                                description: "创建配置目录".to_string(),
-                                command: Some("mkdir -p ~/.config/kimi".to_string()),
-                                copyable_text: None,
-                                note: None,
-                            },
-                            crate::model::SetupStep {
-                                step_number: 2,
-                                description: "创建配置文件".to_string(),
-                                command: None,
-                                copyable_text: Some("api: anthropic-messages\nbaseUrl: http://127.0.0.1:8080/v1\napiKey: dummy".to_string()),
-                                note: Some("保存为 ~/.config/kimi/config.yaml".to_string()),
-                            },
-                            crate::model::SetupStep {
-                                step_number: 3,
-                                description: "启动 Kimi CLI".to_string(),
-                                command: Some("kimi".to_string()),
-                                copyable_text: None,
-                                note: None,
-                            },
-                        ],
-                        config_file_paths: crate::model::PlatformPaths {
-                            macos: Some("~/.config/kimi/config.yaml".to_string()),
-                            linux: Some("~/.config/kimi/config.yaml".to_string()),
-                            windows: Some("%APPDATA%\\kimi\\config.yaml".to_string()),
-                        },
-                        env_vars: vec![
-                            crate::model::EnvVarConfig {
-                                name: "KIMI_BASE_URL".to_string(),
-                                value: "http://127.0.0.1:8080/v1".to_string(),
-                                description: "Kimi CLI 网关地址".to_string(),
-                            },
-                        ],
-                    },
-                ],
-            },
-            coding_plans: vec![
-                crate::model::CodingPlanTemplate {
-                    plan_id: "alaya-lite".to_string(),
-                    name: "Lite".to_string(),
-                    description: "轻量版，适合个人日常开发".to_string(),
-                    tier: crate::model_types::PlanTier::Free,
-                    supported_model_ids: vec!["minimax-2.5".to_string()],
-                    supported_agent_ids: vec!["claude-code".to_string()],
-                    default_model_id: "minimax-2.5".to_string(),
-                    default_agent_id: "claude-code".to_string(),
-                    quota_daily: Some(100),
-                    quota_monthly: Some(2000),
-                    rpm_limit: Some(20),
-                    price: Some("免费".to_string()),
-                    features: vec!["基础代码生成".to_string()],
-                },
-                crate::model::CodingPlanTemplate {
-                    plan_id: "alaya-plus".to_string(),
-                    name: "Plus".to_string(),
-                    description: "进阶版，适合专业开发者".to_string(),
-                    tier: crate::model_types::PlanTier::Pro,
-                    supported_model_ids: vec!["minimax-2.5".to_string(), "glm-5".to_string()],
-                    supported_agent_ids: vec!["claude-code".to_string(), "kimi-cli".to_string()],
-                    default_model_id: "glm-5".to_string(),
-                    default_agent_id: "claude-code".to_string(),
-                    quota_daily: Some(500),
-                    quota_monthly: Some(10000),
-                    rpm_limit: Some(60),
-                    price: Some("¥29/月".to_string()),
-                    features: vec!["多模型切换".to_string(), "专业开发".to_string()],
-                },
-                crate::model::CodingPlanTemplate {
-                    plan_id: "alaya-max".to_string(),
-                    name: "Max".to_string(),
-                    description: "旗舰版，适合团队和高频使用".to_string(),
-                    tier: crate::model_types::PlanTier::Enterprise,
-                    supported_model_ids: vec!["minimax-2.5".to_string(), "glm-5".to_string(), "deepseek-v4-pro".to_string()],
-                    supported_agent_ids: vec!["claude-code".to_string(), "kimi-cli".to_string(), "opencode".to_string(), "kilo-cli".to_string()],
-                    default_model_id: "deepseek-v4-pro".to_string(),
-                    default_agent_id: "claude-code".to_string(),
-                    quota_daily: Some(2000),
-                    quota_monthly: Some(50000),
-                    rpm_limit: Some(200),
-                    price: Some("¥99/月".to_string()),
-                    features: vec!["全模型".to_string(), "全工具".to_string()],
-                },
-            ],
-            models: vec![
-                crate::model::ModelTemplate {
-                    model_id: "minimax-2.5".to_string(),
-                    name: "MiniMax-2.5".to_string(),
-                    description: None,
-                    context_length: Some(256000),
-                    capabilities: vec![crate::model_types::ModelCapability::Code, crate::model_types::ModelCapability::Reasoning],
-                    provider_id: "alaya".to_string(),
-                },
-                crate::model::ModelTemplate {
-                    model_id: "glm-5".to_string(),
-                    name: "GLM-5".to_string(),
-                    description: None,
-                    context_length: Some(128000),
-                    capabilities: vec![crate::model_types::ModelCapability::Code, crate::model_types::ModelCapability::Reasoning, crate::model_types::ModelCapability::ChineseOptimized],
-                    provider_id: "alaya".to_string(),
-                },
-                crate::model::ModelTemplate {
-                    model_id: "deepseek-v4-pro".to_string(),
-                    name: "DeepSeek-V4-Pro".to_string(),
-                    description: None,
-                    context_length: Some(128000),
-                    capabilities: vec![crate::model_types::ModelCapability::Code, crate::model_types::ModelCapability::Reasoning, crate::model_types::ModelCapability::Math],
-                    provider_id: "alaya".to_string(),
-                },
-            ],
-            supported_agents: vec![
-                crate::model::AgentToolRef { agent_id: "claude-code".to_string(), name: "Claude Code".to_string() },
-                crate::model::AgentToolRef { agent_id: "kimi-cli".to_string(), name: "Kimi CLI".to_string() },
-                crate::model::AgentToolRef { agent_id: "opencode".to_string(), name: "OpenCode".to_string() },
-                crate::model::AgentToolRef { agent_id: "kilo-cli".to_string(), name: "Kilo CLI".to_string() },
-            ],
-            version: "0.1.0".to_string(),
-        });
-
-        // Anthropic Provider
-        self.builtin.insert("anthropic".to_string(), crate::model::ProviderTemplate {
-            provider_id: "anthropic".to_string(),
-            name: "Anthropic".to_string(),
-            description: "Claude API 官方直连".to_string(),
-            logo_url: None,
-            homepage: "https://anthropic.com".to_string(),
-            docs_url: "https://docs.anthropic.com".to_string(),
-            get_api_key_url: Some("https://console.anthropic.com/settings/keys".to_string()),
-            setup_guide_url: Some("https://docs.anthropic.com/claude-code/setup".to_string()),
-            api_format: crate::model_types::ApiFormat::Anthropic,
-            base_url: Some("https://api.anthropic.com".to_string()),
-            base_url_template: None,
-            requires_api_key: true,
-            onboarding: crate::model::ProviderOnboarding {
-                description: "Anthropic 官方 Claude API".to_string(),
-                signup_url: "https://console.anthropic.com".to_string(),
-                plans_comparison_url: None,
-                get_key_url: Some("https://console.anthropic.com/settings/keys".to_string()),
-                setup_guide_url: Some("https://docs.anthropic.com/claude-code/setup".to_string()),
-                faq_url: None,
-                agent_setup_guides: vec![
-                    crate::model::AgentSetupGuide {
-                        agent_id: "claude-code".to_string(),
-                        agent_name: "Claude Code".to_string(),
-                        auto_config_supported: true,
-                        auto_config_script: Some("# Set environment variables for Claude Code\nexport ANTHROPIC_BASE_URL=http://127.0.0.1:8080\nexport ANTHROPIC_API_KEY=dummy".to_string()),
-                        manual_steps: vec![
-                            crate::model::SetupStep {
-                                step_number: 1,
-                                description: "设置 Anthropic 基础URL".to_string(),
-                                command: Some("export ANTHROPIC_BASE_URL=http://127.0.0.1:8080".to_string()),
-                                copyable_text: Some("export ANTHROPIC_BASE_URL=http://127.0.0.1:8080".to_string()),
-                                note: Some("将此行添加到 shell 配置文件以持久化".to_string()),
-                            },
-                            crate::model::SetupStep {
-                                step_number: 2,
-                                description: "设置 API Key（网关会替换为实际Key）".to_string(),
-                                command: Some("export ANTHROPIC_API_KEY=dummy".to_string()),
-                                copyable_text: Some("export ANTHROPIC_API_KEY=dummy".to_string()),
-                                note: Some("网关会自动使用您配置的实际 API Key".to_string()),
-                            },
-                            crate::model::SetupStep {
-                                step_number: 3,
-                                description: "配置文件方式（可选）".to_string(),
-                                command: None,
-                                copyable_text: Some("{\n  \"anthropicBaseUrl\": \"http://127.0.0.1:8080\"\n}".to_string()),
-                                note: Some("保存为 Claude 配置目录下的 settings.json".to_string()),
-                            },
-                            crate::model::SetupStep {
-                                step_number: 4,
-                                description: "启动 Claude Code".to_string(),
-                                command: Some("claude".to_string()),
-                                copyable_text: None,
-                                note: None,
-                            },
-                        ],
-                        config_file_paths: crate::model::PlatformPaths {
-                            macos: Some("~/Library/Application Support/Claude/settings.json".to_string()),
-                            linux: Some("~/.config/claude/settings.json".to_string()),
-                            windows: Some("%APPDATA%\\Claude\\settings.json".to_string()),
-                        },
-                        env_vars: vec![
-                            crate::model::EnvVarConfig {
-                                name: "ANTHROPIC_BASE_URL".to_string(),
-                                value: "http://127.0.0.1:8080".to_string(),
-                                description: "网关代理地址".to_string(),
-                            },
-                            crate::model::EnvVarConfig {
-                                name: "ANTHROPIC_API_KEY".to_string(),
-                                value: "dummy".to_string(),
-                                description: "占位Key，网关会替换为实际Key".to_string(),
-                            },
-                        ],
-                    },
-                ],
-            },
-            coding_plans: vec![
-                crate::model::CodingPlanTemplate {
-                    plan_id: "anthropic-default".to_string(),
-                    name: "Anthropic API".to_string(),
-                    description: "Anthropic官方API直连".to_string(),
-                    tier: crate::model_types::PlanTier::Custom,
-                    supported_model_ids: vec!["claude-sonnet-4-5".to_string(), "claude-opus-4".to_string()],
-                    supported_agent_ids: vec!["claude-code".to_string()],
-                    default_model_id: "claude-sonnet-4-5".to_string(),
-                    default_agent_id: "claude-code".to_string(),
-                    quota_daily: None,
-                    quota_monthly: None,
-                    rpm_limit: None,
-                    price: None,
-                    features: vec!["官方直连".to_string()],
-                },
-            ],
-            models: vec![
-                crate::model::ModelTemplate {
-                    model_id: "claude-sonnet-4-5".to_string(),
-                    name: "Claude Sonnet 4.5".to_string(),
-                    description: None,
-                    context_length: Some(200000),
-                    capabilities: vec![crate::model_types::ModelCapability::Code, crate::model_types::ModelCapability::Reasoning],
-                    provider_id: "anthropic".to_string(),
-                },
-                crate::model::ModelTemplate {
-                    model_id: "claude-opus-4".to_string(),
-                    name: "Claude Opus 4".to_string(),
-                    description: None,
-                    context_length: Some(200000),
-                    capabilities: vec![crate::model_types::ModelCapability::Code, crate::model_types::ModelCapability::Reasoning],
-                    provider_id: "anthropic".to_string(),
-                },
-            ],
-            supported_agents: vec![
-                crate::model::AgentToolRef { agent_id: "claude-code".to_string(), name: "Claude Code".to_string() },
-            ],
-            version: "0.1.0".to_string(),
-        });
-
-        tracing::info!("Loaded {} builtin providers", self.builtin.len());
+    /// 从配置加载 Provider 模板
+    fn load_providers_from_config(&self, providers: Vec<ProviderTemplate>) {
+        for provider in providers {
+            let provider_id = provider.provider_id.clone();
+            self.builtin.insert(provider_id.clone(), provider);
+            tracing::debug!("Loaded builtin provider: {}", provider_id);
+        }
+        tracing::info!("Loaded {} builtin providers from agw.yaml", self.builtin.len());
     }
 
     /// 检查远程更新

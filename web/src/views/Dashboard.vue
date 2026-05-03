@@ -148,6 +148,22 @@
                 <ArrowRight />
               </el-icon>
             </div>
+
+            <div class="action-item" @click="$router.push('/settings/agents')">
+              <div class="action-icon">
+                <el-icon :size="22">
+                  <Connection />
+                </el-icon>
+              </div>
+              <div class="action-content">
+                <div class="action-title">管理 Agent 工具</div>
+                <div class="action-desc">编辑或删除 agent 工具</div>
+              </div>
+              <el-icon class="action-arrow">
+                <ArrowRight />
+              </el-icon>
+            </div>
+
             <div class="action-item" @click="$router.push('/plans')">
               <div class="action-icon">
                 <el-icon :size="22">

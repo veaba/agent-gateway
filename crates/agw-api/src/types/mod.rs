@@ -9,6 +9,7 @@ pub mod plugin;
 pub mod agent;
 pub mod stats;
 pub mod apikey;
+pub mod config;
 
 pub use api::*;
 pub use plan::*;
@@ -19,3 +20,4 @@ pub use plugin::*;
 pub use agent::*;
 pub use stats::*;
 pub use apikey::*;
+pub use config::*;

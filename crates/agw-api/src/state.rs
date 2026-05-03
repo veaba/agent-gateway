@@ -10,6 +10,8 @@ use agw_core::{
     storage::{ConfigStore, RequestLogStore, SqliteStore},
 };
 
+use crate::types::ApiConfig;
+
 /// API 共享状态
 #[derive(Clone)]
 pub struct AppState {
@@ -33,6 +35,8 @@ pub struct AppState {
     pub sqlite_store: Arc<SqliteStore>,
     /// 健康检查器
     pub health_checker: Arc<HealthChecker>,
+    /// API 配置
+    pub api_config: ApiConfig,
 }
 
 impl AppState {
@@ -109,6 +113,9 @@ impl AppState {
             Arc::clone(&plan_manager),
         ));
 
+        // 加载 API 配置
+        let api_config = Self::load_api_config(&config_store).await;
+
         tracing::info!("AppState initialized successfully");
         Ok(Self {
             config_store,
@@ -121,7 +128,36 @@ impl AppState {
             log_store,
             sqlite_store,
             health_checker,
+            api_config,
         })
+    }
+
+    /// 加载 API 配置
+    /// 优先从用户配置目录加载 api.yaml，否则使用内置默认值
+    async fn load_api_config(config_store: &ConfigStore) -> ApiConfig {
+        // 尝试从用户配置目录加载
+        let config_path = config_store.config_dir().join("api.yaml");
+        if config_path.exists() {
+            match tokio::fs::read_to_string(&config_path).await {
+                Ok(content) => {
+                    match serde_yaml::from_str::<ApiConfig>(&content) {
+                        Ok(config) => {
+                            tracing::info!("Loaded API config from {}", config_path.display());
+                            return config;
+                        }
+                        Err(e) => {
+                            tracing::warn!("Failed to parse api.yaml: {}, using defaults", e);
+                        }
+                    }
+                }
+                Err(e) => {
+                    tracing::warn!("Failed to read api.yaml: {}, using defaults", e);
+                }
+            }
+        }
+
+        // 使用内置默认值
+        ApiConfig::default()
     }
 
     /// 创建 AppState（带自定义配置目录）
@@ -192,6 +228,9 @@ impl AppState {
             Arc::clone(&plan_manager),
         ));
 
+        // 加载 API 配置
+        let api_config = Self::load_api_config(&config_store).await;
+
         Ok(Self {
             config_store,
             plan_manager,
@@ -203,6 +242,7 @@ impl AppState {
             log_store,
             sqlite_store,
             health_checker,
+            api_config,
         })
     }
 }
