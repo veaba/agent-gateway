@@ -8,6 +8,7 @@ use agw_core::{
     model::FallbackConfig,
     plugin::{PluginRegistry, PluginLifecycle},
     storage::{ConfigStore, RequestLogStore, SqliteStore},
+    paths,
 };
 
 use crate::types::ApiConfig;
@@ -48,16 +49,19 @@ impl AppState {
     pub async fn init() -> anyhow::Result<Self> {
         tracing::info!("Initializing AppState...");
 
+        // 初始化应用目录（包含迁移）
+        paths::init_app_dirs().await?;
+
         // 初始化配置存储
         let config_store = Arc::new(ConfigStore::new()?);
         config_store.init_data_dir().await?;
 
-        // 初始化日志存储
-        let log_dir = config_store.data_dir().join("logs");
+        // 使用统一路径
+        let log_dir = paths::logs_dir();
         let log_store = Arc::new(RequestLogStore::new(log_dir));
 
         // 创建 SQLite 存储
-        let sqlite_path = config_store.data_dir().join("gateway.db");
+        let sqlite_path = paths::db_path();
         let sqlite_store = Arc::new(SqliteStore::new(sqlite_path)?);
 
         // 初始化业务组件
@@ -152,9 +156,9 @@ impl AppState {
 
     /// 加载 API 配置
     /// 优先从用户配置目录加载 api.yaml，否则使用内置默认值
-    async fn load_api_config(config_store: &ConfigStore) -> ApiConfig {
+    async fn load_api_config(_config_store: &ConfigStore) -> ApiConfig {
         // 尝试从用户配置目录加载
-        let config_path = config_store.config_dir().join("api.yaml");
+        let config_path = paths::api_config_path();
         if config_path.exists() {
             match tokio::fs::read_to_string(&config_path).await {
                 Ok(content) => {
@@ -183,12 +187,12 @@ impl AppState {
         let config_store = Arc::new(ConfigStore::with_path(config_dir)?);
         config_store.init_data_dir().await?;
 
-        // 初始化日志存储
-        let log_dir = config_store.data_dir().join("logs");
+        // 使用统一路径
+        let log_dir = paths::logs_dir();
         let log_store = Arc::new(RequestLogStore::new(log_dir));
 
         // 创建 SQLite 存储
-        let sqlite_path = config_store.data_dir().join("gateway.db");
+        let sqlite_path = paths::db_path();
         let sqlite_store = Arc::new(SqliteStore::new(sqlite_path)?);
 
         let mut plan_manager = PlanManager::new(Arc::clone(&config_store));

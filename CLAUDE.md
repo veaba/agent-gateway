@@ -199,6 +199,42 @@ agw completion zsh             # Generate zsh completion
 - **Provider builtins**: Built-in provider templates in `provider_builtin.rs`, remote updates via `index.json`
 - **API Key flow**: Browser launch to provider key page + clipboard monitoring (detects `sk-`, `sk-ant-`, `sk-proj-`, `AIza`, `gsk_`, `kilo_` prefixes)
 
+## Application Data Paths
+
+All application data is stored in a unified directory under the user's home:
+
+```
+~/.agent-gateway/                       # Windows: C:\Users\<用户名>\.agent-gateway
+│                                       # macOS:   /Users/<用户名>/.agent-gateway
+│                                       # Linux:   /home/<用户名>/.agent-gateway
+│                                       # Override via AGENT_GATEWAY_HOME env var
+│
+├── agw.yaml                            # Public config (gateway settings)
+│
+├── agw-core/                           # Core module data
+│   ├── user_plans.yaml                 # User plans config
+│   ├── providers_builtin.yaml          # Provider definitions
+│   ├── fallback.yaml                   # Fallback config
+│   ├── custom_agents.yaml              # Custom agents
+│   ├── custom_providers.yaml           # Custom providers
+│   ├── api.yaml                        # API config
+│   ├── encryption.key                  # Encryption key
+│   ├── gateway.db                      # SQLite database
+│   ├── logs/                           # Request logs
+│   └── plugins/                        # WASM plugins
+│
+├── agw-cli/                            # CLI module data
+│   ├── config.yaml                     # CLI config
+│   └── gateway.pid                     # Runtime PID file
+│
+├── agw-gui/                            # GUI module data
+│   └── config.yaml                     # GUI config (theme, window state)
+│
+└── .migrated.marker                    # Migration marker (created after first run)
+```
+
+**Migration**: On first startup, data from old paths (`AppData/Roaming/agent-gateway` and `AppData/Local/agent-gateway` on Windows) is automatically migrated to the new unified path. Old directories are preserved as backup.
+
 ## Development Notes
 
 - Primary development on Linux

@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use anyhow::Result;
 
 use crate::model::{UserPlansConfig, ProvidersConfig, FallbackConfig, CustomAgentsConfig, CustomProvidersConfig};
+use crate::paths;
 
 /// 配置存储
 pub struct ConfigStore {
@@ -11,11 +12,10 @@ pub struct ConfigStore {
 }
 
 impl ConfigStore {
-    /// 创建配置存储
+    /// 创建配置存储（使用统一路径）
     pub fn new() -> Result<Self> {
-        let config_dir = dirs::config_dir()
-            .ok_or_else(|| anyhow::anyhow!("Cannot find config directory"))?
-            .join("agent-gateway");
+        // 使用新的统一路径模块
+        let config_dir = paths::core_dir();
 
         std::fs::create_dir_all(&config_dir)?;
 
@@ -98,19 +98,16 @@ impl ConfigStore {
         Ok(())
     }
 
-    /// 获取数据目录
+    /// 获取数据目录（现在与配置目录相同，都在 agw-core 下）
     pub fn data_dir(&self) -> PathBuf {
-        dirs::data_local_dir()
-            .unwrap_or_else(|| PathBuf::from("."))
-            .join("agent-gateway")
+        // 使用统一路径
+        paths::core_dir()
     }
 
     /// 初始化数据目录
     pub async fn init_data_dir(&self) -> Result<()> {
-        let data_dir = self.data_dir();
-        tokio::fs::create_dir_all(&data_dir).await?;
-        tokio::fs::create_dir_all(data_dir.join("logs")).await?;
-        tokio::fs::create_dir_all(data_dir.join("plugins")).await?;
+        // 使用统一路径模块确保目录
+        paths::ensure_dirs()?;
         Ok(())
     }
 

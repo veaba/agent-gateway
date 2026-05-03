@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use tokio::fs;
 
 use super::manifest::PluginManifest;
+use crate::paths;
 
 /// 已安装插件信息
 #[derive(Debug, Clone)]
@@ -72,10 +73,7 @@ impl PluginInstaller {
 
     /// 获取插件安装目录
     pub fn plugin_dir() -> PathBuf {
-        dirs::data_local_dir()
-            .unwrap_or_else(|| PathBuf::from("."))
-            .join("agent-gateway")
-            .join("plugins")
+        paths::plugins_dir()
     }
 
     /// 确保插件目录存在
@@ -656,7 +654,7 @@ mod tests {
     #[test]
     fn test_plugin_dir() {
         let dir = PluginInstaller::plugin_dir();
-        assert!(dir.to_string_lossy().contains("agent-gateway"));
+        // 应该包含 plugins 和 .agent-gateway 或自定义路径
         assert!(dir.to_string_lossy().contains("plugins"));
     }
 }

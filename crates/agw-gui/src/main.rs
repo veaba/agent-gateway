@@ -7,6 +7,7 @@ mod gateway;
 mod tray;
 
 use tauri::Manager;
+use agw_core::paths;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -22,9 +23,15 @@ pub fn run() {
         .setup(|app| {
             tracing::info!("agent-gateway GUI starting...");
 
-            let config_dir = app.path().app_config_dir()?;
-            std::fs::create_dir_all(&config_dir)?;
-            tracing::info!("Config directory: {:?}", config_dir);
+            // 使用统一路径模块
+            let gui_dir = paths::gui_dir();
+            std::fs::create_dir_all(&gui_dir)?;
+            tracing::info!("GUI directory: {:?}", gui_dir);
+
+            // 显示所有目录
+            tracing::info!("Root directory: {:?}", paths::root_dir());
+            tracing::info!("Core directory: {:?}", paths::core_dir());
+            tracing::info!("CLI directory: {:?}", paths::cli_dir());
 
             tray::setup_tray(app)?;
 

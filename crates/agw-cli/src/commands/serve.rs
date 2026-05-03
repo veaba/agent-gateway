@@ -7,6 +7,7 @@ use anyhow::Result;
 use clap::Parser;
 
 use agw_core::serve;
+use agw_core::paths;
 
 /// 启动网关服务
 #[derive(Parser, Debug)]
@@ -28,14 +29,12 @@ impl ServeCommand {
 
         let pid_file = self.pid_file.clone()
             .or_else(|| {
-                dirs::data_local_dir()
-                    .map(|d| d.join("agent-gateway").join("gateway.pid"))
-                    .map(|p| p.to_string_lossy().to_string())
+                paths::pid_path().to_string_lossy().to_string().into()
             });
 
         if self.daemon {
             self.run_daemon(&pid_file)?;
-            return Ok(());
+            return Ok(())
         }
 
         // 写入 PID 文件
@@ -92,10 +91,7 @@ impl ServeCommand {
         // Linux/macOS: 使用 nohup
         #[cfg(not(target_os = "windows"))]
         {
-            let log_file = dirs::data_local_dir()
-                .unwrap_or_else(|| PathBuf::from("."))
-                .join("agent-gateway")
-                .join("logs")
+            let log_file = paths::logs_dir()
                 .join("gateway.log");
 
             let mut cmd = std::process::Command::new("nohup");

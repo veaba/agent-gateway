@@ -12,11 +12,14 @@ pub mod storage;
 pub mod security;
 pub mod plugin;
 
+pub mod paths;
+
 pub mod test_utils;
 
 pub use model::*;
 pub use model_types::*;
 pub use core::*;
+pub use paths::*;
 
 /// 全局初始化
 pub async fn init() -> anyhow::Result<()> {

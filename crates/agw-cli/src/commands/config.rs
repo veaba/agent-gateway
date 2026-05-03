@@ -6,6 +6,7 @@ use clap::Parser;
 use std::process::Command;
 
 use agw_core::storage::ConfigStore;
+use agw_core::paths;
 
 /// 配置管理命令
 #[derive(Parser, Debug)]
@@ -20,24 +21,27 @@ pub struct ConfigCommand {
 
 impl ConfigCommand {
     pub async fn run(&self) -> Result<()> {
-        let config_dir = dirs::config_dir()
-            .ok_or_else(|| anyhow::anyhow!("Cannot find config directory"))?
-            .join("agent-gateway");
+        // 使用统一路径
+        let root_dir = paths::root_dir();
+        let core_dir = paths::core_dir();
 
         if self.edit {
-            tracing::info!("Opening config dir: {:?}", config_dir);
+            tracing::info!("Opening config dir: {:?}", root_dir);
 
             #[cfg(target_os = "windows")]
-            Command::new("explorer").arg(&config_dir).spawn()?;
+            Command::new("explorer").arg(&root_dir).spawn()?;
             #[cfg(target_os = "macos")]
-            Command::new("open").arg(&config_dir).spawn()?;
+            Command::new("open").arg(&root_dir).spawn()?;
             #[cfg(target_os = "linux")]
-            Command::new("xdg-open").arg(&config_dir).spawn()?;
+            Command::new("xdg-open").arg(&root_dir).spawn()?;
         } else if self.show {
-            self.handle_show(&config_dir).await?;
+            self.handle_show(&core_dir).await?;
         } else {
             // 默认行为：显示帮助
-            println!("Configuration directory: {}", config_dir.display());
+            println!("Configuration directory: {}", root_dir.display());
+            println!("  Core config:   {}", core_dir.display());
+            println!("  CLI config:    {}", paths::cli_dir().display());
+            println!("  GUI config:    {}", paths::gui_dir().display());
             println!();
             println!("Use --edit to open config editor, or --show to display config");
         }

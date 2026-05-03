@@ -23,6 +23,7 @@ use crate::security::EncryptionService;
 use crate::core::Forwarder;
 use crate::model::UserPlan;
 use crate::model_types::ApiFormat;
+use crate::paths;
 
 /// 网关状态
 pub struct GatewayState {
@@ -45,6 +46,9 @@ unsafe impl Sync for GatewayState {}
 impl GatewayState {
     /// 创建新的网关状态
     pub async fn new() -> anyhow::Result<Self> {
+        // 初始化应用目录（包含迁移）
+        paths::init_app_dirs().await?;
+
         let config_store = Arc::new(ConfigStore::new()?);
         config_store.init_data_dir().await?;
 
@@ -53,8 +57,8 @@ impl GatewayState {
         // 创建 PlanManager
         let plan_manager = Arc::new(PlanManager::new(config_store.clone()));
 
-        // 创建 SQLite 存储
-        let sqlite_path = config_store.data_dir().join("gateway.db");
+        // 使用统一路径
+        let sqlite_path = paths::db_path();
         let sqlite_store = Arc::new(SqliteStore::new(sqlite_path)?);
 
         // 创建带 SQLite 持久化的 QuotaTracker
@@ -89,7 +93,7 @@ impl GatewayState {
             config_store: config_store.clone(),
             sqlite_store,
             encryption: Arc::new(EncryptionService::from_key_file(
-                config_store.config_dir().join("encryption.key")
+                paths::encryption_key_path()
             )?),
             agent_bindings: Arc::new(DashMap::new()),
             default_plan_id: Arc::new(RwLock::new(None)),

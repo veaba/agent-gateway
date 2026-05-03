@@ -5,6 +5,7 @@ use std::sync::Arc;
 use anyhow::Result;
 
 use super::{ConfigStore, SqliteStore, RequestLogStore, RequestLogEntry};
+use crate::paths;
 
 /// 存储管理器
 #[derive(Clone)]
@@ -17,17 +18,17 @@ pub struct StorageManager {
 impl StorageManager {
     /// 创建存储管理器
     pub async fn new() -> Result<Self> {
+        // 初始化应用目录（包含迁移）
+        paths::init_app_dirs().await?;
+
         let config = Arc::new(ConfigStore::new()?);
 
-        // 初始化数据目录
-        config.init_data_dir().await?;
-
-        // 创建数据目录路径
-        let data_dir = config.data_dir();
-        let log_dir = data_dir.join("logs");
+        // 使用统一路径
+        let _data_dir = paths::core_dir();
+        let log_dir = paths::logs_dir();
 
         // 创建存储实例
-        let sqlite_path = data_dir.join("agent_gateway.db");
+        let sqlite_path = paths::db_path();
         let sqlite = Arc::new(SqliteStore::new(sqlite_path)?);
 
         let request_logs = Arc::new(RequestLogStore::new(log_dir));
@@ -52,7 +53,7 @@ impl StorageManager {
         tokio::fs::create_dir_all(data_dir.join("plugins")).await?;
 
         // 创建存储实例
-        let sqlite_path = data_dir.join("agent_gateway.db");
+        let sqlite_path = data_dir.join("gateway.db");
         let sqlite = Arc::new(SqliteStore::new(sqlite_path)?);
 
         let log_dir = data_dir.join("logs");
@@ -67,12 +68,12 @@ impl StorageManager {
 
     /// 获取数据目录
     pub fn data_dir(&self) -> PathBuf {
-        self.config.data_dir()
+        paths::core_dir()
     }
 
     /// 获取日志目录
     pub fn log_dir(&self) -> PathBuf {
-        self.data_dir().join("logs")
+        paths::logs_dir()
     }
 }
 

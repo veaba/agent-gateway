@@ -19,6 +19,7 @@ use commands::{
     completion::CompletionCommand,
     plugin::PluginCommand,
 };
+use agw_core::paths;
 
 /// CLI 应用程序
 #[derive(Parser)]
@@ -119,39 +120,35 @@ async fn main() -> Result<()> {
 
 /// 停止网关服务
 async fn handle_stop() -> Result<()> {
-    let pid_file = dirs::data_local_dir()
-        .map(|d| d.join("agent-gateway").join("gateway.pid"));
+    let pid_file = paths::pid_path();
 
-    match pid_file {
-        Some(path) if path.exists() => {
-            let pid_str = tokio::fs::read_to_string(&path).await?;
-            let pid: u32 = pid_str.trim().parse()
-                .map_err(|e| anyhow::anyhow!("Invalid PID in file: {}", e))?;
+    if pid_file.exists() {
+        let pid_str = tokio::fs::read_to_string(&pid_file).await?;
+        let pid: u32 = pid_str.trim().parse()
+            .map_err(|e| anyhow::anyhow!("Invalid PID in file: {}", e))?;
 
-            println!("Stopping gateway service (PID: {})...", pid);
+        println!("Stopping gateway service (PID: {})...", pid);
 
-            #[cfg(target_os = "windows")]
-            {
-                std::process::Command::new("taskkill")
-                    .args(["/PID", &pid.to_string(), "/F"])
-                    .output()?;
-            }
-            #[cfg(not(target_os = "windows"))]
-            {
-                std::process::Command::new("kill")
-                    .arg(pid.to_string())
-                    .output()?;
-            }
-
-            // 删除 PID 文件
-            tokio::fs::remove_file(&path).await.ok();
-
-            println!("✅ Gateway service stopped.");
+        #[cfg(target_os = "windows")]
+        {
+            std::process::Command::new("taskkill")
+                .args(["/PID", &pid.to_string(), "/F"])
+                .output()?;
         }
-        _ => {
-            println!("⚠️  PID file not found. Gateway may not be running.");
-            println!("   If the gateway is still running, stop it manually.");
+        #[cfg(not(target_os = "windows"))]
+        {
+            std::process::Command::new("kill")
+                .arg(pid.to_string())
+                .output()?;
         }
+
+        // 删除 PID 文件
+        tokio::fs::remove_file(&pid_file).await.ok();
+
+        println!("✅ Gateway service stopped.");
+    } else {
+        println!("⚠️  PID file not found. Gateway may not be running.");
+        println!("   If the gateway is still running, stop it manually.");
     }
 
     Ok(())
