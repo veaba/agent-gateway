@@ -4,8 +4,9 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 
 use agw_api::AppState;
+use agw_api::types::ApiConfig;
 use agw_core::{
-    business::{PlanManager, ProviderEngine, QuotaTracker, HealthChecker},
+    business::{PlanManager, ProviderEngine, QuotaTracker, HealthChecker, CustomAgentManager, CustomProviderManager},
     model::FallbackConfig,
     plugin::PluginLifecycle,
     storage::{ConfigStore, RequestLogStore, SqliteStore},
@@ -47,6 +48,10 @@ pub async fn setup_test_state() -> (AppState, tempfile::TempDir) {
         plan_manager.clone(),
     ));
 
+    // Create custom agent and provider managers
+    let custom_agent_manager = Arc::new(CustomAgentManager::new(Arc::clone(&config_store)));
+    let custom_provider_manager = Arc::new(CustomProviderManager::new(Arc::clone(&config_store)));
+
     let state = AppState {
         config_store,
         plan_manager,
@@ -58,6 +63,9 @@ pub async fn setup_test_state() -> (AppState, tempfile::TempDir) {
         log_store,
         sqlite_store,
         health_checker,
+        custom_agent_manager,
+        custom_provider_manager,
+        api_config: ApiConfig::default(),
     };
 
     (state, temp_dir)

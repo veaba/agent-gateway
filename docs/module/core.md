@@ -243,6 +243,35 @@ let gateway = Gateway::new();
 let response = gateway.handle_request(request, ctx).await?;
 ```
 
+### Unified Router
+
+统一路由合并，用于嵌入式服务器：
+
+```rust
+use agw_core::core::unified_router::create_unified_app;
+use agw_core::core::GatewayState;
+use std::sync::Arc;
+
+// 创建 GatewayState
+let gateway_state = Arc::new(GatewayState::new().await?);
+
+// 创建管理 API 路由 (来自 agw-api)
+let management_router = agw_api::handlers::create_router(api_state);
+
+// 合并 proxy + 管理 API 路由
+let unified_app = create_unified_app(gateway_state, management_router).await;
+
+// 启动统一服务器
+let listener = tokio::net::TcpListener::bind("127.0.0.1:8080").await?;
+axum::serve(listener, unified_app).await?;
+```
+
+**合并后端点：**
+- `/health` - 健康检查
+- `/v1/messages` - Anthropic Messages API
+- `/v1/chat/completions` - OpenAI Chat Completions
+- `/api/v1/*` - 管理 API (30+ 端点)
+
 ### ProtocolConverter
 
 协议转换:

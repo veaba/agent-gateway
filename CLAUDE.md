@@ -117,6 +117,35 @@ kill <PID>                # Linux/macOS
 - `GET /api/v1/quota` - Get quota status
 - `GET /api/v1/fallback` - Get fallback config
 
+## Running the GUI (Unified Server)
+
+```bash
+# Development mode
+cargo run -p agw-gui
+# Embedded unified server starts automatically on http://127.0.0.1:8080
+
+# Production mode
+cargo build -p agw-gui --release
+./target/release/agw-gui.exe
+```
+
+**Embedded Server Endpoints (port 8080):**
+
+- `GET /health` - Health check
+- `POST /v1/messages` - Anthropic Messages API proxy
+- `POST /v1/chat/completions` - OpenAI Chat Completions proxy
+- `GET /api/v1/plans` - Management API (same as agw-api)
+- All `/api/v1/*` endpoints from agw-api
+
+**Server Mode Configuration** (`~/.agent-gateway/agw-gui/server.yaml`):
+
+```yaml
+mode: Embedded                 # Embedded or External
+embedded_listen: "127.0.0.1:8080"
+external_endpoint: null        # For External mode
+auto_start: true
+```
+
 ## Test Commands
 
 ```bash
@@ -198,6 +227,8 @@ agw completion zsh             # Generate zsh completion
 - **Plugin system**: WASM-based via wasmtime + WASI sandbox
 - **Provider builtins**: Built-in provider templates in `provider_builtin.rs`, remote updates via `index.json`
 - **API Key flow**: Browser launch to provider key page + clipboard monitoring (detects `sk-`, `sk-ant-`, `sk-proj-`, `AIza`, `gsk_`, `kilo_` prefixes)
+- **Unified Router**: `create_unified_app()` merges GatewayState proxy routes with AppState management API routes for embedded server mode in Tauri GUI
+- **Server Modes**: GUI supports Embedded (built-in unified server) and External (connect to remote agw-api) modes
 
 ## Application Data Paths
 
@@ -228,7 +259,9 @@ All application data is stored in a unified directory under the user's home:
 │   └── gateway.pid                     # Runtime PID file
 │
 ├── agw-gui/                            # GUI module data
-│   └── config.yaml                     # GUI config (theme, window state)
+│   ├── config.yaml                     # GUI config (theme, window state)
+│   ├── tray.yaml                       # Tray icon config
+│   └── server.yaml                     # Server mode config (Embedded/External)
 │
 └── .migrated.marker                    # Migration marker (created after first run)
 ```

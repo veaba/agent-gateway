@@ -151,12 +151,14 @@ dependencies = [
 name = "agw-gui"
 version = "0.1.0"
 dependencies = [
+ "agw-api",
  "agw-core",
  "anyhow",
  "axum",
  "open",
  "serde",
  "serde_json",
+ "serde_yaml",
  "tauri",
  "tauri-build",
  "tauri-plugin-cli",
